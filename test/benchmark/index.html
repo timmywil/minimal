@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Minimal.js test page | jsPerf</title>
+	<meta charset="utf-8">
+	<meta name="description" content="Tests handling the most basic selectors between qwery, sizzle, and minimal.">
+	<link rel="stylesheet" href="./Benchmark.js/examples/jsperf/main.css">
+	<link rel="shortcut icon" href="http://jsperf.com/favicon.ico">
+	<!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="./Benchmark.js/benchmark.js"></script>
+	<script src="./Benchmark.js/examples/jsperf/ui.js"></script>
+	<script src="./Benchmark.js/plugins/ui.browserscope.js"></script>
+</head>
+<body>
+<article>
+	<hgroup>
+		<h1>Minimal.js perf test</h1>
+		<h2>JavaScript performance comparison</h2>
+	</hgroup>
+	<p class="meta">
+		Test case created by <a href="http://timmywillison.com/" rel="nofollow">Timmy Willison</a>
+		<time datetime="2010-08-02T18:45:23+02:00" pubdate>40 seconds ago</time>
+		and last updated <time datetime="2010-08-02T18:45:51+02:00">12 seconds ago</time>
+	</p>
+
+	<section>
+		<h2>Info</h2>
+		<p>
+			This compares performance between current versions of qwery, sizzle, and minimal for the most basic selectors.
+		</p>
+	</section>
+
+	<section id="prep-code">
+		<h2>Preparation code</h2>
+		<pre><code><span class="sc2">&lt;<span class="kw2">script</span> <span class="kw3">src</span><span class="sy0">=</span><span class="st0">&quot;//github.com/jquery/sizzle/raw/master/sizzle.js&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">script</span>&gt;</span><br><span class="sc2">&lt;<span class="kw2">script</span> <span class="kw3">src</span><span class="sy0">=</span><span class="st0">&quot;//github.com/ded/qwery/raw/master/qwery.js&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">script</span>&gt;</span><br><span class="sc2">&lt;<span class="kw2">script</span> <span class="kw3">src</span><span class="sy0">=</span><span class="st0">&quot;../../src/minimal.js&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">script</span>&gt;</span><br><span class="sc2">&lt;<span class="kw2">div</span> foo<span class="sy0">=</span><span class="st0">&quot;bar&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span><br><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;a&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span><br><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;boosh&quot;</span>&gt;</span><br>&nbsp; <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;a b&quot;</span>&gt;</span><br>&nbsp; &nbsp; <span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;d e&quot;</span> test<span class="sy0">=</span><span class="st0">&quot;fg&quot;</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;booshTest&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span><br>&nbsp; &nbsp; <span class="sc2">&lt;<span class="kw2">em</span> test<span class="sy0">=</span><span class="st0">&quot;f g&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">em</span>&gt;</span><br>&nbsp; &nbsp; <span class="sc2">&lt;<span class="kw2">span</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;h i a&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">span</span>&gt;</span><br>&nbsp; <span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span><br><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span><br><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;attr-test1&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span><br><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;attr-test2&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span><br><span class="sc2">&lt;<span class="kw2">div</span> <span class="kw3">id</span><span class="sy0">=</span><span class="st0">&quot;attr-test3&quot;</span> <span class="kw3">class</span><span class="sy0">=</span><span class="st0">&quot;found you&quot;</span> <span class="kw3">title</span><span class="sy0">=</span><span class="st0">&quot;whatup duders&quot;</span>&gt;&lt;<span class="sy0">/</span><span class="kw2">div</span>&gt;</span><br><span class="sc2">&lt;<span class="kw2">script</span>></span><br>&nbsp; Benchmark.<span class="me1">count</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span><br>&nbsp; Benchmark.<span class="me1">prototype</span>.<span class="me1">setup</span> <span class="sy0">=</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br>&nbsp; &nbsp;<span class="kw2">var</span> Q <span class="sy0">=</span> qwery<span class="sy0">,</span><br>&nbsp; &nbsp; &nbsp; &nbsp;S <span class="sy0">=</span> Sizzle<span class="sy0">,</span><br>&nbsp; &nbsp; &nbsp; &nbsp;QA <span class="sy0">=</span> queryAll<span class="sy0">;</span><br>&nbsp; <span class="br0">#125;</span><span class="sy0">;</span><br><span class="sc2">&lt;<span class="sy0">/</span><span class="kw2">script</span>></span></code></pre>
+	</section>
+
+	<section>
+		<h2>Preparation code output</h2>
+		<div class="foo">
+		<script src="http://github.com/jquery/sizzle/raw/master/sizzle.js"></script>
+		<script src="http://github.com/ded/qwery/raw/master/qwery.js"></script>
+		<script src="../../src/minimal.js"></script>
+		<div foo="bar"></div>
+		<div class="a"></div>
+		<div id="boosh">
+		  <div class="a b">
+		    <div class="d e" test="fg" id="booshTest"></div>
+		    <em test="f g"></em>
+		    <span class="h i a"></span>
+		  </div>
+		</div>
+		<div id="attr-test1"></div>
+		<div id="attr-test2"></div>
+		<div id="attr-test3" class="found you" title="whatup duders"></div></div>
+	</section>
+
+	<section id="runner">
+		<h2>Test runner</h2>
+
+		<p id="firebug"><strong>Warning! For accurate results, please disable Firebug before running the tests. <a href="http://jsperf.com/faq#firebug">(Why?)</a></strong></p>
+
+		<p id="status">
+			<noscript>
+				<strong>
+					To run the tests, please
+					<a href="http://enable-javascript.com/">enable JavaScript</a>
+					and reload the page.
+				</strong>
+			</noscript>
+		</p>
+
+		<div id="controls">
+			<button id="run" type="button"></button>
+		</div>
+
+		<table id="test-table">
+			<caption>Testing in <span id="user-agent"></span></caption>
+			<thead>
+			<tr>
+				<th colspan="2">Test</th>
+				<th title="Operations per second (higher is better)">Ops/sec</th>
+			</tr>
+			</thead>
+			<tbody>
+				<tr>
+				 <th scope="row" id="title-1"><div>Qwery .d</div></th>
+				 <td class="code"><pre><code>Q<span class="br0">&#40;</span><span class="st0">'.d'</span><span class="br0">&#41;</span><span class="sy0">;</span></code></pre></td>
+				 <td id="results-1" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-2"><div>Sizzle .d</div></th>
+				 <td class="code"><pre><code>S<span class="br0">&#40;</span><span class="st0">'.d'</span><span class="br0">&#41;</span><span class="sy0">;</span></code></pre></td>
+				 <td id="results-2" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-3"><div>Minimal .d</div></th>
+				 <td class="code"><pre><code>QA<span class="br0">&#40;</span><span class="st0">'.d'</span><span class="br0">&#41;</span><span class="sy0">;</span></code></pre></td>
+				 <td id="results-3" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-4"><div>Qwery #boosh</div></th>
+				 <td class="code"><pre><code>Q<span class="br0">&#40;</span><span class="st0">'#boosh'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-4" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-5"><div>Sizzle #boosh</div></th>
+				 <td class="code"><pre><code>S<span class="br0">&#40;</span><span class="st0">'#boosh'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-5" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-6"><div>Minimal #boosh</div></th>
+				 <td class="code"><pre><code>QA<span class="br0">&#40;</span><span class="st0">'#boosh'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-6" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-7"><div>Query div</div></th>
+				 <td class="code"><pre><code>Q<span class="br0">&#40;</span><span class="st0">'div'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-7" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-8"><div>Sizzle div</div></th>
+				 <td class="code"><pre><code>S<span class="br0">&#40;</span><span class="st0">'div'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-8" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-9"><div>Minimal div</div></th>
+				 <td class="code"><pre><code>QA<span class="br0">&#40;</span><span class="st0">'div'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-9" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-10"><div>Qwery div.a</div></th>
+				 <td class="code"><pre><code>Q<span class="br0">&#40;</span><span class="st0">'div.a'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-10" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-11"><div>Sizzle div.a</div></th>
+				 <td class="code"><pre><code>S<span class="br0">&#40;</span><span class="st0">'div.a'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-11" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-12"><div>Minimal div.a</div></th>
+				 <td class="code"><pre><code>QA<span class="br0">&#40;</span><span class="st0">'div.a'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-12" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-13"><div>Qwery div.a, .d</div></th>
+				 <td class="code"><pre><code>Q<span class="br0">&#40;</span><span class="st0">'div.a, .d'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-13" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-14"><div>Sizzle div.a, .d</div></th>
+				 <td class="code"><pre><code>S<span class="br0">&#40;</span><span class="st0">'div.a, .d'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-14" class="results">pending…</td>
+				</tr>
+				<tr>
+				 <th scope="row" id="title-15"><div>Minimal div.a, .d</div></th>
+				 <td class="code"><pre><code>QA<span class="br0">&#40;</span><span class="st0">'div.a, .d'</span><span class="br0">&#41;</span></code></pre></td>
+				 <td id="results-15" class="results">pending…</td>
+				</tr>
+			 </tbody>
+		</table>
+	</section>
+
+	<section>
+		<h2>Compare results of other browsers</h2>
+		<div id="bs-results"></div>
+	</section>
+
+	<section id="comments">
+		<h2>0 Comments</h2>
+		<div class="question"><input type="text" name="question" id="question"></div>
+	</section>
+</article>
+
+<footer>
+	&copy; 2011 <a href="http://jsperf.com/">jsPerf.com</a>
+	&bull; <a href="http://jsperf.com/browse">Browse</a>
+	&bull; <a href="http://jsperf.com/faq">FAQ</a>
+	&bull; <a href="http://twitter.com/jsprf" rel="nofollow">twitter: @jsprf</a>
+	&bull; <a href="http://github.com/mathiasbynens/benchmark.js">fork <code>benchmark.js</code> on github</a>
+	&bull; by <a href="http://mathiasbynens.be/" title="Mathias Bynens, front-end web developer">@mathias</a>
+</footer>
+
+<applet code="nano" archive="./Benchmark.js/nano.jar"></applet>
+
+<script>
+	ui.add('Qwery .d', function(){Q('.d');})
+		.add('Sizzle .d', function(){S('.d');})
+		.add('Minimal .d', function(){QA('.d');})
+		.add('Qwery #boosh', function(){Q('#boosh')})
+		.add('Sizzle #boosh', function(){S('#boosh')})
+		.add('Minimal #boosh', function(){QA('#boosh')})
+		.add('Query div', function(){Q('div')})
+		.add('Sizzle div', function(){S('div')})
+		.add('Minimal div', function(){QA('div')})
+		.add('Qwery div.a', function(){Q('div.a')})
+		.add('Sizzle div.a', function(){S('div.a')})
+		.add('Minimal div.a', function(){QA('div.a')})
+		.add('Qwery div.a, .d', function(){Q('div.a, .d')})
+		.add('Sizzle div.a, .d', function(){S('div.a, .d')})
+		.add('Minimal div.a, .d', function(){QA('div.a, .d')});
+
+	try {Benchmark.count = 0;
+		Benchmark.prototype.setup = function() {
+			var Q = qwery,
+			S = Sizzle,
+			QA = queryAll;
+		};
+	} catch(e) {}
+</script>
+</body>
+</html>
