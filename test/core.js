@@ -67,6 +67,42 @@ test("toArray()", function() {
 	ok( !!minimal.toArray( document.documentElement.childNodes ).slice(0,1)[0].nodeName, 'Pass toArray a childNodes array' );
 });
 
+test("indexOf()", function() {
+	
+	expect(15);
+
+	var selections = {
+		p:   q('firstp', 'en', 'sap', 'lastp'),
+		li:  q('listOne', 'listTwo'),
+		div: q('container', 'parent', 'child', 'foo'),
+		a:   q('mark', 'link1', 'simon'),
+		empty: []
+	},
+	tests = {
+		p:    { elem: query('#en'),      index: 1 },
+		li:   { elem: query('#listTwo'), index: 1 },
+		div:  { elem: query('#child'),   index: 2 },
+		a:    { elem: query('#simon'),  index: 2 }
+	},
+	falseTests = {
+		p:  query('#listOne'),
+		li: query('#foo'),
+		empty: ''
+	};
+
+	minimal.each( tests, function( obj, key ) {
+		equal( minimal.indexOf( selections[ key ], obj.elem ), obj.index, obj.elem + ' is in the array of selections of its tag' );
+		// Third arg
+		equal( !!~minimal.indexOf( selections[ key ], obj.elem, 5 ), false, obj.elem + ' is NOT in the array of selections given a starting index greater than its position' );
+		equal( !!~minimal.indexOf( selections[ key ], obj.elem, 1 ), true, obj.elem + ' is in the array of selections given a starting index less than or equal to its position' );
+	});
+
+	minimal.each( falseTests, function( elem, key ) {
+		equal( !!~minimal.indexOf( selections[ key ], elem ), false, 'elem is NOT in the array of selections' );
+	});
+
+});
+
 // Test both each and forEach
 var testEach = function() {
 	minimal.each.apply( null, arguments );
@@ -100,4 +136,13 @@ test('minimal.each', function() {
 		stylesheet_count++;
 	});
 	equal(stylesheet_count, 2, 'should not throw an error in IE while looping over document.styleSheets and return proper amount');
+});
+
+test("minimal.merge", function() {
+
+	deepEqual( minimal.merge([], [1, 2, 3, 4, 5]), [1, 2, 3, 4, 5], 'Merge two arrays' );
+	deepEqual( minimal.merge([1, 2], [3, 4]), [3, 4], 'The second array gets priority' );
+	deepEqual( minimal('.list').merge( queryAll('#foo') ).toArray(), q('foo', 'listTwo', 'listThree', 'listFiveDiv'), 'Merging a minimal object with an array' );
+	deepEqual( minimal('li.list').merge( minimal('div.list') ).toArray(), q('listFiveDiv', 'listTwo', 'listThree'),'Merging a minimal object with another')
+
 });

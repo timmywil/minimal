@@ -22,11 +22,12 @@
 		rtrimRight = /\s+$/,
 		rspaces = /\s+/,
 		ptrim = String.prototype.trim,
-		
+
 		// Core
 		forEach = Array.prototype.forEach,
 		slice = Array.prototype.slice,
-		hasOwnProperty = Object.prototype.hasOwnProperty;
+		hasOwnProperty = Object.prototype.hasOwnProperty,
+		pindexOf = Array.prototype.indexOf;
 
 	/**
 	 * Main constructor
@@ -171,7 +172,7 @@
 	// Simplified merge & extend (merge expects numerical length, extend expects objects)
 	var merge = minimal.merge = function( one, two ) {
 		for ( var i = 0, len = two.length; i < len; i++ ) {
-			one[i] = two[i];
+			one[ i ] = two[ i ];
 		}
 		return one;
 	};
@@ -181,6 +182,20 @@
 		}
 		return one;
 	};
+
+	// Checks if an item is within an array
+	var indexOf = minimal.indexOf = pindexOf ?
+		function( array, searchElement, fromIndex ) {
+			return pindexOf.call( array, searchElement, fromIndex );
+		} :
+		function( array, searchElement, fromIndex ) {
+			for ( var i = fromIndex || 0, len = array.length; i < len; i++ ) {
+				if ( array[ i ] === elem ) {
+					return i;
+				}
+			}
+			return -1;
+		};
 
 	// IE doesn't match non-breaking spaces with \s
 	if ( /\S/.test( "\xA0" ) ) {
@@ -373,7 +388,7 @@
 	minimal.fire = fire;
 
 	// Add internal functions to the prototype
-	var methods = 'each forEach merge toArray'.split(' ');
+	var methods = 'each forEach merge toArray indexOf'.split(' ');
 	each(methods, function( val ) {
 		proto[ val ] = function() {
 			return minimal[ val ].apply( this, [this].concat(slice.call( arguments, 0 )) );
@@ -419,6 +434,19 @@
 		},
 		eq: function( index ) {
 			return this.slice( index, index + 1 );
+		},
+		find: function( selector ) {
+			var elem, sel, j, el,
+				i = 0, ret = [];
+			for ( ; elem = this[i]; i++ ) {
+				sel = queryAll( selector, rid.test(selector) ? document : elem );
+				for ( j = 0; el = sel[ j ]; j++ ) {
+					if ( !~indexOf(ret, el) ) {
+						ret.push( el );
+					}
+				}
+			}
+			return new minimal( ret );
 		}
 	});
 

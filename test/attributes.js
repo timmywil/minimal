@@ -32,17 +32,10 @@ test("getAttr()", function() {
 	var body = document.body, $body = minimal(body);
 	strictEqual( $body.getAttr('foo'), null, 'Make sure that a non existent attribute returns null' );
 
-	// Not sure I want to do this (minimal is minimal)
-	// var select = document.createElement('select'), optgroup = document.createElement('optgroup'), option = document.createElement('option');
-	// optgroup.appendChild( option );
-	// select.appendChild( optgroup );
-	// 
-	// equal( minimal( option ).attr('selected'), 'selected', 'Make sure that a single option is selected, even when in an optgroup.' );
-
 	equal( minimal('#logo').getAttr('width'), '10', 'Retrieve width attribute an an element with display:none.' );
 	equal( minimal('#logo').getAttr('height'), '12', 'Retrieve height attribute an an element with display:none.' );
 
-	// Check value on button element (#1954)
+	// Value should retrieve value attribute on buttons
 	equal( minimal('#button1').getAttr('value'), 'foobar', 'Value retrieval on a button does not return innerHTML' );
 
 	equal( minimal('#table1').setAttr('test:attrib', 'foobar').getAttr('test:attrib'), 'foobar', 'Setting an attribute on a table with a colon does not throw an error.' );
