@@ -190,7 +190,7 @@
 		} :
 		function( array, searchElement, fromIndex ) {
 			for ( var i = fromIndex || 0, len = array.length; i < len; i++ ) {
-				if ( array[ i ] === elem ) {
+				if ( array[ i ] === searchElement ) {
 					return i;
 				}
 			}
@@ -338,7 +338,7 @@
 	/**
 	 * Events
 	 */
-	var on, off, fnCache;
+	var on, off, fnCache, preventDefault, stopPropogation;
 	if ( 'addEventListener' in document ) {
 		on = function( node, type, fn ) {
 			if ( 'addEventListener' in node ) {
@@ -354,11 +354,17 @@
 	// IE
 	} else {
 		fnCache = {}; // used for event context
+		preventDefault = function() { this.returnValue = false; };
+		stopPropagation = function() { this.cancelBubble = true; };
 		on = function( node, type, fn ) {
 			var f;
 			if ( 'attachEvent' in node ) {
-				f = fnCache[ fn ] = function() {
-					fn.call( node );
+				f = fnCache[ fn ] = function( e ) {
+					if ( !('preventDefault' in e) ) {
+						e.preventDefault = preventDefault;
+						e.stopPropagation = stopPropagation;
+					}
+					fn.call( node, e );
 				};
 				node.attachEvent( 'on' + type, f);
 			}
@@ -427,7 +433,7 @@
 	 */
 	extend(proto, {
 		slice: function( start, end ) {
-			return new minimal( toArray(this).slice(start, end) );
+			return new minimal( slice.apply( toArray(this), arguments ) );
 		},
 		first: function() {
 			return this.slice(0, 1);

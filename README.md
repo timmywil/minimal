@@ -1,8 +1,6 @@
 minimal.js
 ================
 
-An experiment.
-
 The #1 priority for minimal is ***FAST***.  #2 is ***small***.
 
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
@@ -120,6 +118,68 @@ This is only used as a quick way to convert a NodeList to a proper Array for man
 	minimal.toArray( getElementsByTagName('div') );
 
 
+
+##Classes
+
+Class manipulation is one of the most important things in javascript. All of the normal class methods are included in minimal, and obviously they are small and fast. All of these methods are included on the minimal object for per-node manipulation as well as on the minimal prototype for minimal objects.
+
+###.addClass( classStr )
+
+	$('#foo').addClass('bar');
+	minimal.addClass( elem, 'bar' );
+
+###.removeClass( classStr )
+
+	$('#foo').removeClass('bar');
+	$('#foo').removeClass(); // Removes all classes
+	minimal.removeClass( elem ); // Removes all classes on the given element
+
+###.toggleClass( classStr )
+
+	$('.baz').toggleClass('test');
+	minimal.toggleClass( elem, 'test' );
+
+###.hasClass( classStr )
+
+`@return {Boolean}`
+
+	$('.test').hasClass('test'); // Returns true
+
+
+##Attributes
+
+When writing minimal, I rethought how we should treat attributes. IE is terrible at keeping attributes and properties separate, but modern browsers handle it with grace and ease. However, IE can handle things quite well if the DOM level 2 functions are used. I think you'll be surprised at how short and powerful minimal's attribute engine has turned out.
+
+Keep in mind, this engine is not for those who do not understand the difference between attributes and properties. For instance, do not use get/setAttr for checking a checkbox with javascript.  You should already know that the `checked` attribute corresponds to the `defaultChecked` property and not the `checked` property.  [Boolean attributes](http://www.w3.org/TR/html4/intro/sgmltut.html#h-3.3.4.2) store initial or default values, while it is the properties that stay up-to-date with current values.  Manipulating attributes is necessary and powerful, but property manipulation is often the right way to go, and when it comes to minimal, no methods are needed for that. You'll be flying high with raw javascript properties.
+
+###Notes
+
+- All values for attributes are strings
+- No hook is provided for the `style` attribute. Use the `elem.style.cssText` property instead.
+- The `value` attribute only stores the `defaultValue`, but can be used to see if an input has changed its value since page-load.
+- Setting a boolean attribute to `false` does not remove it for you. Set the property instead.
+
+#
+###.getAttr( name )
+
+	$('#anchor1').getAttr('title');
+	$('#anchor1').getAttr('href');
+	$('a').getAttr('rel'); // Returns the rel of the first anchor in the matched set
+	$('#input1').getAttr('type');
+
+
+###.setAttr( name, value )
+
+	$('#anchor1').setAttr('title', 'weeeeeeeee');
+	$('#foo').setAttr('contenteditable', true); // contenteditable is an [enumerated attribute](http://www.w3.org/TR/html5/author/common-microsyntaxes.html#enumerated-attribute)
+
+
+###.removeAttr( name )
+
+	$('#anchor1').removeAttr('title');
+
+
+
 ##Traversing
 
 minimal offers a few of the quickest traversing functions so that the minimal object can be manipulated to contain the elements you want without having to break your chain.  These are the methods currently offered:
@@ -172,4 +232,48 @@ This is the same as `.eq(0)` or `.slice(0, 1)`.
 
 
 
-***more coming soon***
+##Events
+
+Events are common enough that they are needed in a minimalistic library. Events are bound using best-practices, but no fake bubbling, delegation handling( such as for live events ), nor vast event object normalization is provided.  Nevertheless, if those things are needed, adding that logic yourself on a per-need basis is the best option for this library.
+
+As per usual, all methods in this area are also on the minimal object for per-node binding( e.g. `minimal.on( elem, 'click', fn )` ).
+
+***Note:*** [event.preventDefault](https://developer.mozilla.org/en/DOM/event.preventDefault) and [event.stopPropagation](https://developer.mozilla.org/en/DOM/event.stopPropagation) are normalized for the event object.
+
+###.on( type, fn )
+
+	var doClick = function( e ) {
+		e.preventDefault();
+		// Do something on click
+	};
+	$('a').on('click', doClick);
+
+
+###.off( type, fn )
+
+In order to unbind, the function previously bound is required. This is in line with native browser behavior and simply means that the user defines bound functions without minimal creating unnecessary overhead.
+
+	$('a').off('click', doClick);
+
+
+###.fire( type )
+
+Trigger an event on the matched elements.
+
+	$('a').fire('click');
+	minimal.fire( elem, 'click' );
+
+
+##Modules that probably won't be added
+
+1. Animations and effects
+	- There are so many ways to do effects nowadays. I am speaking of the increasing popularity of [css transtions/animations](https://developer.mozilla.org/en/CSS/CSS_transitions).  The only javascript that should be used for those is add/removeClass.<br>
+	As for javascript animations, there's the introduction of [requestAnimationFrame](https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame) to Webkit and Firefox, and will be supported in IE10 and an upcoming version of Opera. In light of this, I'd like to leave effects out of minimal and let you include exactly the kinds of animation code you want to include. Besides, in terms of minimal, I'm not sure I'd do more than just add [tween.js](https://github.com/sole/tween.js) as a submodule. :)
+
+##Modules that may be added in the future
+
+1. Retrieve **computed** styles ( the addition of a css method ).
+2. A short, cross-browser way to do a simple ajax request.
+
+
+***Stay tuned***

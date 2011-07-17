@@ -1,7 +1,7 @@
 module("events");
 
 test("on()", function() {
-	expect(2);
+	expect(5);
 	var $text = minimal('#text1');
 
 	stop();
@@ -13,13 +13,25 @@ test("on()", function() {
 
 	$text.on('focus', focus);
 	$text[0].focus();
+
+	document.location.hash = '';
+	var click = function( e ) {
+		equal( typeof e.preventDefault, 'function', 'Prevent default is present on the event object' );
+		equal( typeof e.stopPropagation, 'function', 'stopPropogation is present on the event object' );
+		e.preventDefault();
+	};
+
+	var $a = minimal('#anchor2');
+	$a.on('click', click);
+	$a.fire('click');
+	equal( document.location.hash.replace('#', ''), '', 'Default action prevented' );
 });
 
 test("off()", function() {
 	expect(3);
 	var $a = minimal('#link1');
 	var cnt = 0;
-	var click = function() {
+	var click = function( e ) {
 		deepEqual( $a[0], this, 'Click context is the element' );
 		cnt++;
 	};
