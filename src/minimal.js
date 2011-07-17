@@ -262,7 +262,7 @@
 	/**
 	 * Attributes
 	 */
-	var getAttr;
+	var getAttr, removeAttr;
 	if ( support.getSetAttribute ) {
 		getAttr = function( node, name ) {
 			var nType;
