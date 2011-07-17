@@ -412,7 +412,7 @@
 	 */
 	extend(proto, {
 		slice: function( start, end ) {
-			return minimal( toArray(this).slice(start, end) );
+			return new minimal( toArray(this).slice(start, end) );
 		},
 		first: function() {
 			return this.slice(0, 1);
