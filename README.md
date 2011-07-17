@@ -5,7 +5,7 @@ An experiment.
 
 The #1 priority for minimal is ***FAST***.  #2 is ***small***.
 
-With these priorities in mind, users should have at least an intermediate understanding of javascript as this library intends to push you towards the ideal by not supporting those practices which are commonly understood to be slower.  For instance, consider minimal's selector engine.
+With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
 
 ## Selector
