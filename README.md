@@ -1,7 +1,7 @@
 minimal.js
 ================
 
-The #1 priority for minimal is ***FAST***.  #2 is ***small*** (currently 5kb minified).
+The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 5kb minified).
 
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
@@ -59,8 +59,8 @@ For responsible infection of the global namespace, this function is provided to 
 - `@param {Boolean} deep` - Restore window.minimal
 - `@return {Object}` Returns minimal
 
-
-	minimal.noConflict( true, true );
+#
+	var min = minimal.noConflict( true, true );
 
 ##Core
 
@@ -74,7 +74,7 @@ Largely based off [underscore.js](http://documentcloud.github.com/underscore/), 
 
 `minimal.each()` is also on the prototype and the context for those iterators is the current minimal object.
 
-***Note***: The iterator function is passed arguments in the order of value then key. This differs from jQuery in that the element or object value is the first argument rather than the index.
+___Note___: The iterator function is passed arguments in the order of value then key. This differs from jQuery in that the element or object value is the first argument rather than the index.
 
 	$('li').each(function( li, key ) {
 		console.log( 'At index: %d, ID is: %s', key, li.id );
@@ -83,7 +83,7 @@ Largely based off [underscore.js](http://documentcloud.github.com/underscore/), 
 
 ###minimal.merge( one, two ) & .merge( two ) & minimal.extend( one, two )
 
-`merge` has a sister called `extend` and instead of both functions doing only slightly different things for both arrays and objects, merge and extend do exactly the same thing but merge is for arrays (or minimal objects because they contain a .length proerty) and `extend` is for objects.
+`merge` has a sister named `extend` and instead of both functions doing only slightly different things for both arrays and objects, merge and extend do exactly the same thing but merge is for arrays (or minimal objects because they contain a .length property) and `extend` is for objects.
 
 	minimal.merge([], [1, 2, 3, 4, 5]) ==> [1, 2, 3, 4, 5]
 	minimal.merge([1, 2], [3, 4])      ==> [3, 4] // Notice 1 and 2 were overwritten because they were at the same indices.
@@ -121,7 +121,7 @@ This is only used as a quick way to convert a NodeList to a proper Array for man
 
 ##Classes
 
-Class manipulation is one of the most important things in javascript. All of the normal class methods are included in minimal, and obviously they are small and fast. All of these methods are included on the minimal object for per-node manipulation as well as on the minimal prototype for minimal objects.
+Class manipulation is one of the most important things in javascript. All of the normal class methods are included in minimal, and obviously they are small and fast. All of these methods are included on the minimal object for per-node manipulation as well as on the minimal prototype.
 
 ###.addClass( classStr )
 
@@ -158,7 +158,7 @@ Keep in mind, this engine is not for those who do not understand the difference 
 - No hook is provided for the `style` attribute. Use the `elem.style.cssText` property instead.
 - The `value` attribute only stores the `defaultValue`, but can be used to see if an input has changed its value since page-load.
 - Setting a boolean attribute to `false` does not remove it for you. Set the property instead.
-- Something to be aware of: some attributes that look like boolean attributes are actually [enumerated attributes](http://www.w3.org/TR/html5/author/common-microsyntaxes.html#enumerated-attribute), which means their values are the strings `'true'` and `'false'` rather than booleans `true` and `false` (e.g. `contenteditable`, `aria-*`, `data-*`, `autocomplete`, `draggable`).  A full list of [boolean attributes](http://www.w3.org/TR/html4/intro/sgmltut.html#h-3.3.4.2) is collected on my [blog](http://www.timmywillison.com/2011/When-to-use-.attr()-and-.prop().html).
+- Some attributes that look like boolean attributes are actually [enumerated attributes](http://www.w3.org/TR/html5/author/common-microsyntaxes.html#enumerated-attribute), which means their values are the strings `'true'` and `'false'` rather than booleans `true` and `false` (e.g. `contenteditable`, `aria-*`, `data-*`, `autocomplete`, `draggable`).  A full list of [boolean attributes](http://www.w3.org/TR/html4/intro/sgmltut.html#h-3.3.4.2) is collected on my <a href="http://www.timmywillison.com/2011/When-to-use-.attr()-and-.prop().html">blog</a>.
 
 #
 ###.getAttr( name )
@@ -188,7 +188,7 @@ minimal offers a few of the quickest traversing functions so that the minimal ob
 
 ###.find( selector )
 
-Find can be even more useful than a context selection, but may not always be as fast.  It will not add any element to the minimal object that is already there and your selections are always scoped which will mean improved performance *if* the main selector is not an ID.  Since IDs should be unique to a page (and there really are no exceptions to this), they should simply be passed to getElementById without a context.
+Find can be even more useful than a context selection, but may not always be as fast.  It will not add any element to the minimal object that is already there and your selections are always scoped which will mean improved performance _if_ the main selector is not an ID.  Since IDs should be unique to a page (and there really are no exceptions to this), they should simply be passed to getElementById without a context.
 
 	// Finds all table rows within all tables
 	$('table').find('tr');
@@ -204,7 +204,7 @@ Find can be even more useful than a context selection, but may not always be as 
 
 ###.slice( start, end )
 
-Indices are *zero-indexed* integers. Indexes work the same as [`Array.prototype.slice`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/slice).
+Indices are _zero-indexed_ integers. Indexes work the same as [`Array.prototype.slice`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/slice).
 
 	// Retrieves the first five div elements
 	$('div').slice(0, 4);
@@ -215,7 +215,7 @@ Indices are *zero-indexed* integers. Indexes work the same as [`Array.prototype.
 
 ###.eq( index )
 
-Also *zero-indexed*, this will return a minimal object containing the element at that index in the object.
+Also _zero-indexed_, this will return a minimal object containing the element at that index in the object.
 
 	// Returns a minimal object with the first element
 	$('div').eq( 0 );
@@ -239,7 +239,7 @@ Events are common enough that they are needed in a minimalistic library. Events 
 
 As per usual, all methods in this area are also on the minimal object for per-node binding( e.g. `minimal.on( elem, 'click', fn )` ).
 
-***Note:*** [event.preventDefault](https://developer.mozilla.org/en/DOM/event.preventDefault) and [event.stopPropagation](https://developer.mozilla.org/en/DOM/event.stopPropagation) are normalized for the event object.
+___Note:___ [event.preventDefault](https://developer.mozilla.org/en/DOM/event.preventDefault) and [event.stopPropagation](https://developer.mozilla.org/en/DOM/event.stopPropagation) are normalized for the event object.
 
 ###.on( type, fn )
 
@@ -265,16 +265,16 @@ Trigger an event on the matched elements.
 	minimal.fire( elem, 'click' );
 
 
-##Modules that probably won't be added
+##Things that probably won't be added
 
-1. Animations and effects
+1. __Animations and effects__
 	- There are so many ways to do effects nowadays. I am speaking of the increasing popularity of [css transtions/animations](https://developer.mozilla.org/en/CSS/CSS_transitions).  The only javascript that should be used for those is add/removeClass.<br>
 	As for javascript animations, there's the introduction of [requestAnimationFrame](https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame) to Webkit and Firefox, and will be supported in IE10 and an upcoming version of Opera. In light of this, I'd like to leave effects out of minimal and let you include exactly the kinds of animation code you want to include. Besides, in terms of minimal, I'm not sure I'd do more than just add [tween.js](https://github.com/sole/tween.js) as a submodule. :)
 
-##Modules that may be added in the future
+##Things that may be added in the future
 
-1. Retrieve **computed** styles ( the addition of a css method ).
-2. A short, cross-browser way to do a simple ajax request.
+1. Retrieve __computed__ styles.
+2. A short, cross-browser way to do a simple __ajax__ request.
+3. More traversal functions such as __filter__ and __not__.
 
-
-***Stay tuned***
+___Stay tuned___
