@@ -1,7 +1,7 @@
 minimal.js
 ================
 
-The #1 priority for minimal is ***FAST***.  #2 is ***small***.
+The #1 priority for minimal is ***FAST***.  #2 is ***small*** (currently 5kb minified).
 
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
