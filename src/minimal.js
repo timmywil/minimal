@@ -215,7 +215,7 @@
 
 	/**
 	 * Classes
-	 * Some class manipulation is based off of Google's code for the html5 presentation
+	 * Some class manipulation is based off of Google's code for the html5 presentation (http://code.google.com/p/html5slides/)
 	 */
 	var addClass = minimal.addClass = function( node, classStr ) {
 		classStr = classStr.split( rspaces );

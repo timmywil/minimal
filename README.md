@@ -68,7 +68,7 @@ These are the main utility functions offered in minimal.
 
 ###minimal.each( obj, fn, context ) & .each( fn, context )
 
-Largely based off underscore.js, this each uses the forEach for both arrays and objects when available, then provides fallbacks that should work the same way. Unlike jQuery, returning false does not stop the iteration. Native forEach does not support this so it did not seem appropriate to provide that in the fallbacks.
+Largely based off [underscore.js](http://documentcloud.github.com/underscore/), this each uses the forEach for both arrays and objects when available, then provides fallbacks that should work the same way. Unlike jQuery, returning false does not stop the iteration. Native forEach does not support this so it did not seem appropriate to provide that in the fallbacks.
 
 `@param context`: functions can be run in any context.  If no context is provided, the iterators run in the context of the `obj`.
 
