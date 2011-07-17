@@ -158,6 +158,7 @@ Keep in mind, this engine is not for those who do not understand the difference 
 - No hook is provided for the `style` attribute. Use the `elem.style.cssText` property instead.
 - The `value` attribute only stores the `defaultValue`, but can be used to see if an input has changed its value since page-load.
 - Setting a boolean attribute to `false` does not remove it for you. Set the property instead.
+- Something to be aware of: some attributes that look like boolean attributes are actually [enumerated attributes](http://www.w3.org/TR/html5/author/common-microsyntaxes.html#enumerated-attribute), which means their values are the strings `'true'` and `'false'` rather than booleans `true` and `false` (e.g. `contenteditable`, `aria-*`, `data-*`, `autocomplete`, `draggable`).  A full list of [boolean attributes](http://www.w3.org/TR/html4/intro/sgmltut.html#h-3.3.4.2) is collected on my [blog](http://www.timmywillison.com/2011/When-to-use-.attr()-and-.prop().html).
 
 #
 ###.getAttr( name )
@@ -171,7 +172,7 @@ Keep in mind, this engine is not for those who do not understand the difference 
 ###.setAttr( name, value )
 
 	$('#anchor1').setAttr('title', 'weeeeeeeee');
-	$('#foo').setAttr('contenteditable', true); // contenteditable is an [enumerated attribute](http://www.w3.org/TR/html5/author/common-microsyntaxes.html#enumerated-attribute)
+	$('#foo').setAttr('contenteditable', true); // contenteditable is enumerated
 
 
 ###.removeAttr( name )
