@@ -10,7 +10,7 @@ With these priorities in mind, users should have at least an intermediate unders
 
 ## Selector
 
-The minimal selector engine supports a limited set of selectors for the sake of performance. More advanced selectors will not be added unless the performance can be upheld. This is the fastest selector engine around, but it will not support css3 selectors (benchmarks available in the repo).
+The minimal selector engine supports a limited set of selectors for the sake of performance. Because of this, it is the fastest selector engine around, but it does not support css3 selectors. (selector benchmarks available in the repo)
 
 Supported selector types, in order of performance, include:
 
