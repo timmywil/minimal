@@ -18,11 +18,17 @@ Supported selector types, in order of performance, include:
 - tag
 - class
 - tag.class
-- context (performance depends on scope and main selector type)
 - multiple selectors separated by commas
+- context (performance depends on scope and main selector type)
+	+ Supported context types
+		* Any selector type supported
+		* An individual element
+		* A minimal object
 - and that's it!
 
-**Note**: descendants are not allowed, but passing a context can actually improve performance by limiting the scope of the selection.<br>
-e.g. `$('div', '#parent')`
+###Notes
+
+- Although descendants are not supported, passing a context can actually improve performance by limiting the scope of the selection.<br> e.g. `$('div', '#parent')`
+- When passing a context, the main selector should not be an ID. e.g. `$('#child', '#parent')` as IDs should be unique. Minimal does not hide this error.
 
 #####...more coming soon...
