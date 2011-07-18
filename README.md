@@ -1,14 +1,14 @@
 minimal.js
 ================
 
-The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 5kb minified).
+The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 4.9kb minified without gzip).
 
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
 
 ## Selector
 
-The minimal selector engine supports a limited set of selectors for the sake of performance. Because of this, it is the fastest selector engine around, but it does not support css3 selectors. (selector benchmarks available in the repo)
+The minimal selector engine supports a limited set of selectors for the sake of performance. Because of this, it is the fastest selector engine around, but it does not support css3 selectors. (benchmarks in the repo and on [jsperf](http://jsperf.com/qwery-vs-sizzle/11))
 
 Supported selector types, in order of performance, include:
 
@@ -39,8 +39,8 @@ The minimal selector engine. It is exposed to the global object( and can be remo
 `@return An Array object of elements`
 
 	queryAll('#foo')  ==> [ <div id="foo"></div> ]
-	queryAll('.list') ==> [ <li class="list"></li>, <li class="list"></li>]
-	queryAll('div')   ==> [ <div id="container"></div>, <div id="foo"></div>]
+	queryAll('.list') ==> [ <li class="list"></li>, <li class="list"></li> ]
+	queryAll('div')   ==> [ <div id="container"></div>, <div id="foo"></div> ]
 
 ###query( selector, context )
 
@@ -112,7 +112,7 @@ This will use the native [`String.prototype.trim`](https://developer.mozilla.org
 
 ###minimal.toArray( nodeList ) & .toArray()
 
-This is only used as a quick way to convert a NodeList to a proper Array for manipulation in the minimal object.  This method is exposed for your convenience, but should not be used for converting anything and everything to an array. Normally, `Array.prototype.slice` works fine for that, but IE cannot convert NodeLists with `slice`.
+This is only used as a quick way to convert a NodeList to a proper Array for manipulation in the minimal object.  This method is exposed for your convenience, but should not be used for converting anything and everything to an array. Normally, [`Array.prototype.slice`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/slice) works fine for that, but IE cannot convert NodeLists with `slice`.
 
 	minimal('.list').toArray() // is the same as queryAll('.list') but can be convenient when chaining
 	minimal.toArray( getElementsByTagName('div') );

@@ -82,37 +82,42 @@
 			return toArray( selector );
 		}
 
-		var match, elem, ret, m;
+		var match, elem, ret, m, i, j;
 
 		// ID
 		if ( match = rid.exec(selector) ) {
 			return ( elem = root.getElementById( match[1] ) ) ? [ elem ] : [];
+
 		// Tag, Class, and Tag.Class
 		} else if ( match = rtagclass.exec(selector) ) {
+
 			if ( m = match[1] ) {
 				return toArray( root.getElementsByTagName(m) );
-			} else if ( m = match[3] ) {
+			}
 
-				// Class
-				if ( !match[2] && 'getElementsByClassName' in root ) {
-					return toArray( root.getElementsByClassName(m) );
+			m = match[3];
 
-				// Tag.Class
-				} else if ( 'querySelectorAll' in root ) {
-					return toArray( root.querySelectorAll( selector ) );
+			// Class
+			if ( !match[2] && root.getElementsByClassName ) {
+				return toArray( root.getElementsByClassName(m) );
+			}
 
-				// IE fallback
-				} else {
-					var tags = root.getElementsByTagName( match[2] || '*' );
-					ret = [];
-					for ( var j = 0; elem = tags[j]; j++ ) {
-						if ( ~(' ' + elem.className + ' ').indexOf( ' ' + m + ' ' ) ) {
-							ret.push( elem );
-						}
-					}
-					return ret;
+			// Tag.Class
+			if ( root.querySelectorAll ) {
+				return toArray( root.querySelectorAll( selector ) );
+			}
+
+			// IE fallback
+			match = root.getElementsByTagName( match[2] || '*' );
+			ret = [];
+			j = 0;
+			m = ' ' + m + ' ';
+			for ( ; elem = match[ j ]; j++ ) {
+				if ( ~(' ' + elem.className + ' ').indexOf( m ) ) {
+					ret.push( elem );
 				}
 			}
+			return ret;
 
 		// Multiple selectors
 		} else {
@@ -120,12 +125,12 @@
 			selector = selector.split( rcomma );
 
 			// No split means selector not supported
-			if ( selector.length === 1 ) {
-				throw new Error( 'Invalid selector: ' + selector );
+			if ( selector.length < 2 ) {
+				throw 'Invalid selector: ' + selector;
 			}
 
-			for ( var i = 0, sel; sel = selector[ i ]; i++ ) {
-				ret = ret.concat( queryAll( sel, root ) );
+			for ( i = 0; elem = selector[ i ]; i++ ) {
+				ret = ret.concat( queryAll( elem, root ) );
 			}
 			return ret;
 		}
@@ -339,14 +344,14 @@
 	 * Events
 	 */
 	var on, off, fnCache, preventDefault, stopPropogation;
-	if ( 'addEventListener' in document ) {
+	if ( document.addEventListener ) {
 		on = function( node, type, fn ) {
-			if ( 'addEventListener' in node ) {
+			if ( node.addEventListener ) {
 				node.addEventListener( type, fn, false );
 			}
 		};
 		off = function( node, type, fn ) {
-			if ( 'removeEventListener' in node ) {
+			if ( node.removeEventListener ) {
 				node.removeEventListener( type, fn, false );
 			}
 		};
@@ -358,19 +363,19 @@
 		stopPropagation = function() { this.cancelBubble = true; };
 		on = function( node, type, fn ) {
 			var f;
-			if ( 'attachEvent' in node ) {
+			if ( node.attachEvent ) {
 				f = fnCache[ fn ] = function( e ) {
-					if ( !('preventDefault' in e) ) {
+					if ( typeof e.preventDefault !== 'function' ) {
 						e.preventDefault = preventDefault;
 						e.stopPropagation = stopPropagation;
 					}
 					fn.call( node, e );
 				};
-				node.attachEvent( 'on' + type, f);
+				node.attachEvent( 'on' + type, f );
 			}
 		};
 		off = function( node, type, fn ) {
-			if ( 'detachEvent' in node ) {
+			if ( node.detachEvent ) {
 				node.detachEvent( 'on' + type, fnCache[ fn ] || fn );
 			}
 		};
@@ -379,7 +384,7 @@
 	minimal.off = off;
 
 	var fire;
-	if ( 'createEvent' in document ) {
+	if ( document.createEvent ) {
 		fire = function( node, type ) {
 			var event = document.createEvent('HTMLEvents');
 			event.initEvent( type, true, true );
