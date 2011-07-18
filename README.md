@@ -6,6 +6,14 @@ The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 4.9kb m
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
 
+## About this repo
+
+There is no makefile because minimal.js is just one file. All of the testing you'd expect is in the test folder along with a benchmark page that looks just like jsperf.  All tests should be run with a local server, but a simple static server will do (until ajax is added).
+
+
+DOCS
+================
+
 ## Selector
 
 The minimal selector engine supports a limited set of selectors for the sake of performance. Because of this, it is the fastest selector engine around, but it does not support css3 selectors. (benchmarks in the repo and on [jsperf](http://jsperf.com/qwery-vs-sizzle/11))
@@ -270,6 +278,7 @@ Trigger an event on the matched elements.
 1. __Animations and effects__
 	- There are so many ways to do effects nowadays. I am speaking of the increasing popularity of [css transtions/animations](https://developer.mozilla.org/en/CSS/CSS_transitions).  The only javascript that should be used for those is add/removeClass.<br>
 	As for javascript animations, there's the introduction of [requestAnimationFrame](https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame) to Webkit and Firefox, and will be supported in IE10 and an upcoming version of Opera. In light of this, I'd like to leave effects out of minimal and let you include exactly the kinds of animation code you want to include. Besides, in terms of minimal, I'm not sure I'd do more than just add [tween.js](https://github.com/sole/tween.js) as a submodule. :)
+
 
 ##Things that may be added in the future
 
