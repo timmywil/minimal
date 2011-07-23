@@ -1,7 +1,7 @@
-minimal.js v0.1
+minimal.js v0.2pre
 ================
 
-The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 4.9kb minified without gzip).
+The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.1kb minified/2.5kb gzipped).
 
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
@@ -189,6 +189,61 @@ Keep in mind, this engine is not for those who do not understand the difference 
 
 
 
+##CSS
+
+As you know, IE does computed CSS differently than other browsers. minimal has a powerful CSS engine that matches the consistency of major libraries, but instead of having one big slow method, minimal has a getter method that varies depending on browser support of `getComputedStyle`.  This method can handle pretty much anything you throw at it and, when appropriate, will give you consistent pixel values across browsers where it might normally return a percentage, `em`, or some other unit.
+
+
+###Notes
+
+- It is faster to use node.style when _setting_ your styles. A `.setCSS()` method is provide to allow manipulating minimal objects without needing to break a chain, but the _only_ difference between this method and setting node.style is the `float` property, which varies across browsers.  minimal normalizes this property for you by using `cssFloat` or `styleFloat` where needed.
+- As with the `.getAttr()` method, `.getCSS()` will return the value for the first node in the minimal object.
+- To retrieve computed `width` or `height` on a hidden element, the user must swap `display: none` with `visibility: hidden; position: absolute; display: block` themselves rather than relying on the minimal library to do it for them. This will make for faster code.
+
+#
+###.getCSS( name )
+
+	// Retrieve the computed top of an element
+	$('#foo').getCSS('top');
+	
+	// Retrieve a computed float value
+	$('#foo').getCSS('float');
+	
+	// Retrieve computed width on the first image
+	$('img').getCSS('width');
+
+###.setCSS( name, value )
+
+	// Set the float style property
+	$('#foo').setCSS('float', 'left');
+	
+	// Set the display on multiple images
+	$('img').setCSS('display', 'block');
+
+
+
+##Window and Document Dimensions
+
+The window and document require special treatment when retrieving width/height on them. Instead of including this code in getCSS, minimal has two methods for specifically retrieving these values. __Note:__ These functions are not on the prototype
+
+
+###minimal.getWinDimension( name )
+
+	// Retrieve the window width
+	$.getWinDimension('width');
+	
+	// Retrieve the window height
+	$.getWinDimension('height');
+
+###minimal.getDocDimension( name )
+
+	// Retrieve the document width
+	$.getDocDimension('width');
+	
+	// Retrieve the document height
+	$.getDocDimension('height');
+
+
 ##Traversing
 
 minimal offers a few of the quickest traversing functions so that the minimal object can be manipulated to contain the elements you want without having to break your chain.  These are the methods currently offered:
@@ -282,8 +337,7 @@ Trigger an event on the matched elements.
 
 ##Things that may be added in the future
 
-1. Retrieve __computed__ styles.
-2. A short, cross-browser way to do a simple __ajax__ request.
-3. More traversal functions such as __filter__ and __not__.
+1. A short, cross-browser way to do a simple __ajax__ request.
+2. More traversal functions such as __filter__ and __not__.
 
-___Stay tuned___
+

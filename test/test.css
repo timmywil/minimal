@@ -1,3 +1,11 @@
 #logo {
     display: none;
 }
+
+#qunit-fixture {
+    font-size: 16px;
+}
+
+.em {
+    font-size: 2em;
+}

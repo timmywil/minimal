@@ -23,7 +23,7 @@ test("noConflict()", function() {
 });
 
 test("Constructor", function() {
-	expect(8);
+	expect(10);
 
 	// Constructor behavior
 	equal( minimal().length, 0, 'minimal() === minimal([])' );
@@ -35,6 +35,9 @@ test("Constructor", function() {
 	ok( minimal('#foo') instanceof minimal, 'Self instantiated' );
 	equal( minimal('div.list').length, 1, 'Length property' );
 	equal( minimal('.list').length, 4, 'Multiple objects' );
+	equal( minimal( document.getElementById('foo') ).length, 1, 'Minimal takes elements' );
+	equal( minimal(document).length, 1, 'Minimal object of a document' );
+
 });
 
 test("minimal.trim()", function() {
@@ -135,7 +138,7 @@ test('minimal.each', function() {
 	testEach(document.styleSheets, function( i ) {
 		stylesheet_count++;
 	});
-	equal(stylesheet_count, 2, 'should not throw an error in IE while looping over document.styleSheets and return proper amount');
+	equal(stylesheet_count, 4, 'should not throw an error in IE while looping over document.styleSheets and return proper amount');
 });
 
 test("minimal.merge", function() {

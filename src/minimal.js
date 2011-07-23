@@ -1,5 +1,5 @@
 /**
- * @license minimal.js v0.1
+ * @license minimal.js v0.2pre
  * Copyright (c) 2011 timmy willison
  * Dual licensed under the MIT and GPL licenses.
  * http://timmywillison.com/licence/
@@ -22,6 +22,12 @@
 		rtrimRight = /\s+$/,
 		rspaces = /\s+/,
 		ptrim = String.prototype.trim,
+
+		// Attributes
+		rleveltwo = /(?:href|src|width|height)/i,
+
+		// CSS
+		rnotnumpx = /^-?\d+[^p\s\d]+$/i,
 
 		// Core
 		forEach = Array.prototype.forEach,
@@ -76,17 +82,24 @@
 		}
 
 		if ( typeof selector !== 'string' ) {
-			if ( selector.nodeName ) {
+			if ( selector.style ) {
+				// An element that is not the window or document
 				return [ selector ];
 			}
+
+			if ( selector.documentElement ) {
+				// The document
+				return [ selector.documentElement ];
+			}
+
 			return toArray( selector );
 		}
 
-		var match, elem, ret, m, i, j;
+		var match, node, ret, m, i, j;
 
 		// ID
 		if ( match = rid.exec(selector) ) {
-			return ( elem = root.getElementById( match[1] ) ) ? [ elem ] : [];
+			return ( node = root.getElementById( match[1] ) ) ? [ node ] : [];
 
 		// Tag, Class, and Tag.Class
 		} else if ( match = rtagclass.exec(selector) ) {
@@ -112,9 +125,9 @@
 			ret = [];
 			j = 0;
 			m = ' ' + m + ' ';
-			for ( ; elem = match[ j ]; j++ ) {
-				if ( ~(' ' + elem.className + ' ').indexOf( m ) ) {
-					ret.push( elem );
+			for ( ; node = match[ j ]; j++ ) {
+				if ( ~(' ' + node.className + ' ').indexOf( m ) ) {
+					ret.push( node );
 				}
 			}
 			return ret;
@@ -129,8 +142,8 @@
 				throw 'Invalid selector: ' + selector;
 			}
 
-			for ( i = 0; elem = selector[ i ]; i++ ) {
-				ret = ret.concat( queryAll( elem, root ) );
+			for ( i = 0; node = selector[ i ]; i++ ) {
+				ret = ret.concat( queryAll( node, root ) );
 			}
 			return ret;
 		}
@@ -268,16 +281,17 @@
 
 	/**
 	 * Support
-	 * Currently houses the support test for attributes, but is built to be expandable
 	 */
 	var support = minimal.support = (function() {
 		var div = document.createElement('div');
 		div.setAttribute('className', 't');
+		div.innerHTML = '<b style="float:left"></b>';
+		var b = div.getElementsByTagName('b')[0];
 		return {
-			getSetAttribute: div.className !== 't'
+			getSetAttribute: div.className !== 't',
+			cssFloat: !!b.style.cssFloat
 		};
 	})();
-
 
 	/**
 	 * Attributes
@@ -291,6 +305,7 @@
 				return null;
 			}
 			// Does not normalize to undefined or null
+			// Both values are useful
 			return node.getAttribute( name );
 		};
 		removeAttr = function( node, name, value ) {
@@ -299,13 +314,17 @@
 	} else {
 		// IE6/7
 		getAttr = function( node, name ) {
-			var nType;
+			var nType, ret;
 			// don't get/set attributes on text, comment and attribute nodes
 			if ( !node || (nType = node.nodeType) === 3 || nType === 8 || nType === 2 ) {
 				return null;
 			}
-			var ret = node.getAttributeNode( name );
-			return ret && (ret = ret.nodeValue) !== '' ? ret : null;
+			if ( rleveltwo.test( name ) ) {
+				return node.getAttribute( name, 2 );
+			} else {
+				ret = node.getAttributeNode( name );
+				return ret && (ret = ret.nodeValue) !== '' ? ret : null;
+			}
 		};
 		removeAttr = function( node, name, value ) {
 			node.setAttribute( name, '' );
@@ -315,7 +334,7 @@
 	minimal.getAttr = getAttr;
 	minimal.removeAttr = removeAttr;
 
-	var setAttr = minimal.setAttr = function( node, name, value ) {
+	minimal.setAttr = function( node, name, value ) {
 		var nType, ret;
 
 		// don't get/set attributes on text, comment and attribute nodes
@@ -337,6 +356,82 @@
 		}
 
 		node.setAttribute( name, value );
+	};
+
+
+	/**
+	 * CSS
+	 */
+	var cssProps = {
+		// Normalize float
+		'float': support.cssFloat ? 'cssFloat' : 'styleFloat'
+	};
+
+	var getCSS;
+	if ( window.getComputedStyle ) {
+		getCSS = function( node, name ) {
+			name = cssProps[ name ] || name;
+
+			var style,
+				ret = getComputedStyle( node, null )[ name ];
+			return !ret ? (style = node.style) && style[ name ] : ret;
+		};
+	} else if ( document.documentElement.currentStyle ) {
+		getCSS = function( node, name ) {
+			name = cssProps[ name ] || name;
+
+			// Credits to jQuery
+			var left, rsLeft, style, 
+				ret = node.currentStyle && node.currentStyle[ name ];
+
+			// Uses the pixel converter by Dean Edwards
+			// http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
+			if ( rnotnumpx.test( ret ) ) {
+				rsLeft = node.runtimeStyle && node.runtimeStyle[ name ];
+				style = node.style;
+
+				left = style.left;
+				if ( rsLeft ) {
+					node.runtimeStyle.left = node.currentStyle.left;
+				}
+				style.left = name === 'fontSize' ? '1em' : (ret || 0);
+				ret = style.pixelLeft + 'px';
+
+				// Revert the changed values
+				style.left = left;
+				if ( rsLeft ) {
+					node.runtimeStyle.left = rsLeft;
+				}
+			}
+
+			return ret === '' ? 'auto' :
+				!ret ? (style = node.style) && style[ name ] : ret;
+		};
+	}
+	minimal.getCSS = getCSS;
+
+	minimal.setCSS = function( node, name, value ) {
+		name = cssProps[ name ] || name;
+		node.style[ name ] = value;
+	};
+
+
+	/**
+	 * Window/Document dimensions
+	 */
+	minimal.getWinDimension = function( name ) {
+		name = name.charAt(0).toUpperCase() + name.slice(1); // Capitialize
+		var docElemProp = document.documentElement[ "client" + name ];
+		return document.compatMode === "CSS1Compat" && docElemProp ||
+			document.body[ "client" + name ] || docElemProp;
+	};
+	minimal.getDocDimension = function( name ) {
+		name = name.charAt(0).toUpperCase() + name.slice(1); // Capitialize
+		return Math.max(
+			document.documentElement[ "client" + name ],
+			document.body["scroll" + name], document.documentElement[ "scroll" + name ],
+			document.body["offset" + name], document.documentElement[ "offset" + name ]
+		);
 	};
 
 
@@ -405,12 +500,12 @@
 			return minimal[ val ].apply( this, [this].concat(slice.call( arguments, 0 )) );
 		};
 	});
-	methods = 'addClass removeClass toggleClass setAttr removeAttr on off fire'.split(' ');
+	methods = 'addClass removeClass toggleClass setAttr removeAttr setCSS on off fire'.split(' ');
 	each(methods, function( val ) {
 		proto[ val ] = function() {
-			var elem, i = 0;
-			for ( ; elem = this[i]; i++ ) {
-				minimal[ val ].apply( elem, [elem].concat(slice.call( arguments, 0 )) );
+			var node, i = 0;
+			for ( ; node = this[i]; i++ ) {
+				minimal[ val ].apply( node, [node].concat(slice.call( arguments, 0 )) );
 			}
 			return this;
 		};
@@ -418,19 +513,21 @@
 
 	// If any of the elements have the class, return true
 	proto.hasClass = function( classStr ) {
-		var elem, i = 0, ret;
-		for ( ; elem = this[i]; i++ ) {
-			if ( hasClass(elem, classStr) ) {
+		var node, i = 0, ret;
+		for ( ; node = this[i]; i++ ) {
+			if ( hasClass(node, classStr) ) {
 				return true;
 			}
 		}
 		return false;
 	};
 
-	// getAttr only returns for the first node
-	proto.getAttr = function( name ) {
-		return getAttr( this[0], name );
-	};
+	// getAttr/getCSS only return for the first node
+	each([ 'getAttr', 'getCSS' ], function( val ) {
+		proto[ val ] = function( name ) {
+			return minimal[ val ]( this[0], name );
+		};
+	});
 
 
 	/**
@@ -447,10 +544,10 @@
 			return this.slice( index, index + 1 );
 		},
 		find: function( selector ) {
-			var elem, sel, j, el,
+			var node, sel, j, el,
 				i = 0, ret = [];
-			for ( ; elem = this[i]; i++ ) {
-				sel = queryAll( selector, rid.test(selector) ? document : elem );
+			for ( ; node = this[i]; i++ ) {
+				sel = queryAll( selector, rid.test(selector) ? document : node );
 				for ( j = 0; el = sel[ j ]; j++ ) {
 					if ( !~indexOf(ret, el) ) {
 						ret.push( el );
