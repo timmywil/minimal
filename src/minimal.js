@@ -54,7 +54,7 @@
 	};
 
 	var proto = minimal.prototype;
-	proto.version = '0.1';
+	proto.version = '0.2pre';
 
 	var toArray = minimal.toArray = function( list ) {
 		var i = 0,
