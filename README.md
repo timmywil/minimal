@@ -1,10 +1,11 @@
 minimal.js v0.2pre
 ================
 
-The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.1kb minified/2.5kb gzipped).
+The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.5k minified/2.7k gzipped).
 
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
+### Supported browsers: IE6+, Firefox 3.0+, Chrome, Safari, Opera, blahblah
 
 ## About this repo
 
@@ -211,6 +212,10 @@ As you know, IE does computed CSS differently than other browsers. minimal has a
 	
 	// Retrieve computed width on the first image
 	$('img').getCSS('width');
+	
+	// Opacity support for filters in IE (returns a string just like default browser behavior)
+	$('#foo').getCSS('opacity');
+
 
 ###.setCSS( name, value )
 
@@ -219,6 +224,10 @@ As you know, IE does computed CSS differently than other browsers. minimal has a
 	
 	// Set the display on multiple images
 	$('img').setCSS('display', 'block');
+	
+	// Opacity set with filters in IE
+	// Can be passed a number, but browsers return strings when getting
+	$('#foo').setCSS('opacity', 0.4);
 
 
 

@@ -2,7 +2,7 @@ module("css");
 
 
 test("getCSS()/setCSS()", function() {
-	expect(16);
+	expect(18);
 
 	var $con = minimal('#container');
 	equal( $con.getCSS('display'), 'block', 'Check for css property "display"');
@@ -30,6 +30,10 @@ test("getCSS()/setCSS()", function() {
 	equal( $img.getCSS('float'), 'none', 'Float starts as none when computed' );
 	equal( $img.setCSS('float', 'left').getCSS('float'), 'left', 'Set float style' );
 	equal( $img.setCSS('float', '').getCSS('float'), 'none', 'Reset float' );
+
+	strictEqual( minimal('#opacityTest').getCSS('opacity'), '0.25', 'Test retrieving opacity on div element' );
+	$foo.setCSS('opacity', 0.5);
+	strictEqual( $foo.getCSS('opacity'), '0.5', 'Set and get opacity' );
 });
 
 test("getWinDimension()", function() {
