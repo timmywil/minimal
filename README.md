@@ -377,6 +377,9 @@ Trigger an event on the matched elements.
 	As for javascript animations, there's the introduction of [requestAnimationFrame](https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame) to Webkit and Firefox, and will be supported in IE10 and an upcoming version of Opera. In light of this, I'd like to leave effects out of minimal and let you include exactly the kinds of animation code you want to include. Besides, in terms of minimal, I'm not sure I'd do more than just add [tween.js](https://github.com/sole/tween.js) as a submodule. :)
 
 
-##Things that may be added in the future
+##Things that may or may not be added in the future
 
 1. A short, cross-browser way to do a simple __ajax__ request.
+	- Mostly just creating an xhr object across browsers for the user and letting the user take it from there.
+2. Node __manipulation__ for appending and cloning elements.
+	- The most common things don't really need a library, so this may not be right for minimal.
