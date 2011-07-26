@@ -29,3 +29,26 @@ test("find()", function() {
 
 	deepEqual( minimal('#container, #foo').find('p').toArray(), q('firstp', 'sndp', 'en', 'sap', 'lastp'), 'Find all p\'s within container and foo. Remove dups.' );
 });
+
+test("filter()", function() {
+	expect(11);
+
+	var $list = minimal('.list');
+	var $filtered = $list.filter(function( node, i ) {
+		deepEqual( this, node, 'Context is set to the node and node is passed as the first argument' );
+		equal( typeof i, 'number', 'index is passed as second argument' );
+		return this.id === 'listFiveDiv';
+	});
+	deepEqual( $filtered.toArray(), q('listFiveDiv'), '.list elements properly filtered to contain only the #listFiveDiv' );
+
+	$filtered = $list.filter(function( node, i ) {
+		return node.id !== 'listFiveDiv' && i !== 1;
+	});
+
+	deepEqual( $filtered.toArray(), q('listOne', 'listThree'), '.list elements filtered to contain 1, 3, and 4');
+
+	$filtered = minimal('input', '#container').filter(function() {
+		return this.type === 'checkbox';
+	});
+	deepEqual( $filtered.toArray(), q('check1'), 'Filter inputs by type to get the checkbox');
+});

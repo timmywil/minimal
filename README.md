@@ -1,7 +1,7 @@
 minimal.js v0.2pre
 ================
 
-The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.5k minified/2.7k gzipped).
+The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.6k minified/2.7k gzipped).
 
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
@@ -275,6 +275,32 @@ Find can be even more useful than a context selection, but may not always be as 
 	// this is faster than find because there's no need to check for duplicates
 	$('.list', '#parent');
 
+
+###.filter( filterFunction )
+
+The `.filter()` method is a quick way to reduce the current set of elements based off any criteria you supply. Instead of passing a selector that must be parsed and matched against the existing elements, you control what criteria to filter the elements with.  This function can also be used as the equivalent of a `.not()` function (just return the opposite value in your qualifying function).
+
+The qualifying `filterFunction` is passed the `node` and `index` of the node in the matched set in that order and is executed in the context of the `node`.
+
+	// Get the alternating set of list elements
+	$('li', '#unorderedList').filter(function( node, index ) {
+		return index % 2 === 0;
+	});
+	
+	// The reverse of the previous example
+	$('li', '#unorderedList').filter(function( node, index ) {
+		return index % 2 !== 0;
+	});
+	
+	// Filter inputs by type
+	$('input').filter(function() {
+		return this.type === 'checkbox';
+	});
+	
+	// Get all inputs that are not of type image
+	$('input').filter(function() {
+		return this.type !== 'image';
+	});
 
 ###.slice( start, end )
 

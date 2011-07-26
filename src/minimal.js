@@ -596,6 +596,17 @@
 				}
 			}
 			return new minimal( ret );
+		},
+		filter: function( fn ) {
+			var node,
+				ret = [],
+				i = 0;
+			for ( ; node = this[i]; i++ ) {
+				if ( fn.call(node, node, i) ) {
+					ret.push( node );
+				}
+			}
+			return new minimal( ret );
 		}
 	});
 
