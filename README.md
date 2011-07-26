@@ -1,4 +1,4 @@
-minimal.js v0.2
+minimal.js v0.3pre
 ================
 
 The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.6k minified/2.7k gzipped).

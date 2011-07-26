@@ -1,5 +1,5 @@
 /**
- * @license minimal.js v0.2
+ * @license minimal.js v0.3pre
  * Copyright (c) 2011 timmy willison
  * Dual licensed under the MIT and GPL licenses.
  * http://timmywillison.com/licence/
@@ -54,7 +54,7 @@
 	};
 
 	var proto = minimal.prototype;
-	proto.version = '0.2';
+	proto.version = '0.3pre';
 
 	var toArray = minimal.toArray = function( list ) {
 		var i = 0,
