@@ -1,4 +1,4 @@
-minimal.js v0.2pre
+minimal.js v0.2
 ================
 
 The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.6k minified/2.7k gzipped).
@@ -380,6 +380,3 @@ Trigger an event on the matched elements.
 ##Things that may be added in the future
 
 1. A short, cross-browser way to do a simple __ajax__ request.
-2. More traversal functions such as __filter__ and __not__.
-
-
