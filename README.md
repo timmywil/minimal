@@ -197,12 +197,12 @@ As you know, IE does computed CSS differently than other browsers. minimal has a
 
 ###Notes
 
-- It is faster to use node.style when _setting_ your styles. A `.setCSS()` method is provide to allow manipulating minimal objects without needing to break a chain, but the _only_ difference between this method and setting node.style is the `float` property, which varies across browsers.  minimal normalizes this property for you by using `cssFloat` or `styleFloat` where needed.
-- As with the `.getAttr()` method, `.getCSS()` will return the value for the first node in the minimal object.
-- To retrieve computed `width` or `height` on a hidden element, the user must swap `display: none` with `visibility: hidden; position: absolute; display: block` themselves rather than relying on the minimal library to do it for them. This will make for faster code.
+- To retrieve computed `width` or `height` on a hidden element, the user must swap `display: none` with `visibility: hidden; position: absolute; display: block` themselves rather than relying on the minimal library to do it for them. This will make for faster code and a smaller javascript library.
 
 #
 ###.getCSS( name )
+
+As with the `.getAttr()` method, `.getCSS()` will return the value for the first node in the minimal object.
 
 	// Retrieve the computed top of an element
 	$('#foo').getCSS('top');
@@ -218,6 +218,8 @@ As you know, IE does computed CSS differently than other browsers. minimal has a
 
 
 ###.setCSS( name, value )
+
+It is faster to use `node.style` when _setting_ your styles. A `.setCSS()` method is provide to allow manipulating minimal objects without needing to break a chain. It also normalizes the `opacity` and `float` properties across browsers, but other than those two properties (or unless setting on multiple elements), setting with `node.style` is the best option in terms of performance.
 
 	// Set the float style property
 	$('#foo').setCSS('float', 'left');
@@ -320,13 +322,18 @@ ___Note:___ [event.preventDefault](https://developer.mozilla.org/en/DOM/event.pr
 		// Do something on click
 	};
 	$('a').on('click', doClick);
-
+	
+	var imgLoad = function( e ) {
+		console.log('Image loaded: ', this.src);
+	};
+	$('img').on('load', imgLoad);
 
 ###.off( type, fn )
 
 In order to unbind, the function previously bound is required. This is in line with native browser behavior and simply means that the user defines bound functions without minimal creating unnecessary overhead.
 
 	$('a').off('click', doClick);
+	$('img').off('load', imgLoad);
 
 
 ###.fire( type )
