@@ -305,7 +305,7 @@
 			var nType;
 			// don't get/set attributes on text, comment and attribute nodes
 			if ( !node || (nType = node.nodeType) === 3 || nType === 8 || nType === 2 ) {
-				return null;
+				return undefined;
 			}
 			// Does not normalize to undefined or null
 			// Both values are useful
@@ -320,7 +320,7 @@
 			var nType, ret;
 			// don't get/set attributes on text, comment and attribute nodes
 			if ( !node || (nType = node.nodeType) === 3 || nType === 8 || nType === 2 ) {
-				return null;
+				return undefined;
 			}
 			if ( rleveltwo.test( name ) ) {
 				return node.getAttribute( name, 2 );
@@ -535,14 +535,12 @@
 	minimal.fire = fire;
 
 	// Add internal functions to the prototype
-	var methods = 'each forEach merge toArray indexOf'.split(' ');
-	each(methods, function( val ) {
+	each('each forEach merge toArray indexOf'.split(' '), function( val ) {
 		proto[ val ] = function() {
 			return minimal[ val ].apply( this, [this].concat(slice.call( arguments, 0 )) );
 		};
 	});
-	methods = 'addClass removeClass toggleClass setAttr removeAttr setCSS on off fire'.split(' ');
-	each(methods, function( val ) {
+	each('addClass removeClass toggleClass setAttr removeAttr setCSS on off fire'.split(' '), function( val ) {
 		proto[ val ] = function() {
 			var node, i = 0;
 			for ( ; node = this[i]; i++ ) {
