@@ -13,10 +13,10 @@
 		_query = window.query,
 
 		// Selector
-		rcomma = /[\s*]?,[\s*]?/,
+		rcomma = /\s*,\s*/,
 		rid = /^#([\w\-]+)$/,
-		rtagclass = /^(?:^([\w\-]+)$)|(?:^([\w]+)?\.([\w\-]+)$)/,
-		
+		rtagclass = /^(?:([\w]+)|([\w]+)?\.([\w\-]+))$/,
+
 		// Classes
 		rtrimLeft = /^\s+/,
 		rtrimRight = /\s+$/,
@@ -32,10 +32,15 @@
 		ralpha = /alpha\([^)]*\)/i,
 
 		// Core
-		forEach = Array.prototype.forEach,
-		slice = Array.prototype.slice,
-		hasOwnProperty = Object.prototype.hasOwnProperty,
-		pindexOf = Array.prototype.indexOf;
+		forEach = [].forEach,
+		slice = [].slice,
+		push = [].push,
+		pindexOf = [].indexOf,
+		hasOwnProperty = ({}).hasOwnProperty,
+
+		ID = 'minimal@timmywillison.com';
+
+		expandoProxy = ID + "/proxy";
 
 	/**
 	 * Main constructor
@@ -43,18 +48,30 @@
 	var minimal = function( selector, root ) {
 
 		// Self-instantiate if not instantiated
-		if ( !this.version ) {
+		if ( !this[ ID ] ) {
 			return new minimal( selector, root );
 		}
 
-		var selection = queryAll( selector, root );
+		if ( selector == null ) {
+			this.length = 0;
+			return;
+		}
 
-		this.length = selection.length;
-		merge( this, selection );
+		if ( typeof selector === 'string' ) {
+			this.length = 0;
+			push.apply( this, queryAll( selector, root ) );
+
+		} else if ( this[0] = selector.nodeType ? selector : selector.documentElement ) {
+			this.length = 1;
+
+		} else {
+			this.length = selector.length;
+			merge( this, selector );
+		}
 	};
 
 	var proto = minimal.prototype;
-	proto.version = '0.3pre';
+	proto[ ID ] = proto.version = '0.3pre';
 
 	var toArray = minimal.toArray = function( list ) {
 		var i = 0,
@@ -83,21 +100,7 @@
 			return [];
 		}
 
-		if ( typeof selector !== 'string' ) {
-			if ( selector.style ) {
-				// An element that is not the window or document
-				return [ selector ];
-			}
-
-			if ( selector.documentElement ) {
-				// The document
-				return [ selector.documentElement ];
-			}
-
-			return toArray( selector );
-		}
-
-		var match, node, ret, m, i, j;
+		var match, node, ret, mTag, mClass, i, j;
 
 		// ID
 		if ( match = rid.exec(selector) ) {
@@ -105,16 +108,17 @@
 
 		// Tag, Class, and Tag.Class
 		} else if ( match = rtagclass.exec(selector) ) {
+			mTag = match[1] || match[2];
+			mClass = match[3];
 
-			if ( m = match[1] ) {
-				return toArray( root.getElementsByTagName(m) );
+			// Tag
+			if ( !mClass ) {
+				return toArray( root.getElementsByTagName(mTag) );
 			}
 
-			m = match[3];
-
 			// Class
-			if ( !match[2] && root.getElementsByClassName ) {
-				return toArray( root.getElementsByClassName(m) );
+			if ( !mTag && root.getElementsByClassName ) {
+				return toArray( root.getElementsByClassName(mClass) );
 			}
 
 			// Tag.Class
@@ -123,12 +127,12 @@
 			}
 
 			// IE fallback
-			match = root.getElementsByTagName( match[2] || '*' );
+			match = root.getElementsByTagName( mTag || '*' );
 			ret = [];
 			j = 0;
-			m = ' ' + m + ' ';
-			for ( ; node = match[ j ]; j++ ) {
-				if ( ~(' ' + node.className + ' ').indexOf( m ) ) {
+			mClass = ' ' + mClass + ' ';
+			for ( ; node = match[ j ]; ++j ) {
+				if ( ~(' ' + node.className + ' ').indexOf( mClass ) ) {
 					ret.push( node );
 				}
 			}
@@ -144,8 +148,8 @@
 				throw 'Invalid selector: ' + selector;
 			}
 
-			for ( i = 0; node = selector[ i ]; i++ ) {
-				ret = ret.concat( queryAll( node, root ) );
+			for ( i = 0; node = selector[ i ]; ++i ) {
+				push.apply( ret, queryAll( node, root ) );
 			}
 			return ret;
 		}
@@ -209,11 +213,18 @@
 			return pindexOf.call( array, searchElement, fromIndex );
 		} :
 		function( array, searchElement, fromIndex ) {
-			for ( var i = fromIndex || 0, len = array.length; i < len; i++ ) {
+			var i = 0, len = array.length;
+
+			if ( fromIndex != null ) {
+				i = fromIndex < 0 ? Math.max( 0, len + fromIndex ) : fromIndex;
+			}
+
+			for ( ; i < len; ++i ) {
 				if ( array[ i ] === searchElement ) {
 					return i;
 				}
 			}
+
 			return -1;
 		};
 
@@ -479,7 +490,7 @@
 	/**
 	 * Events
 	 */
-	var on, off, fnCache, preventDefault, stopPropogation;
+	var on, off, preventDefault, stopPropogation;
 	if ( document.addEventListener ) {
 		on = function( node, type, fn ) {
 			if ( node.addEventListener ) {
@@ -500,19 +511,19 @@
 		on = function( node, type, fn ) {
 			var f;
 			if ( node.attachEvent ) {
-				f = fnCache[ fn ] = function( e ) {
+				f = fn[ expandoProxy ] || ( fn[ expandoProxy ] = function( e ) {
 					if ( typeof e.preventDefault !== 'function' ) {
 						e.preventDefault = preventDefault;
 						e.stopPropagation = stopPropagation;
 					}
 					fn.call( node, e );
-				};
+				});
 				node.attachEvent( 'on' + type, f );
 			}
 		};
 		off = function( node, type, fn ) {
 			if ( node.detachEvent ) {
-				node.detachEvent( 'on' + type, fnCache[ fn ] || fn );
+				node.detachEvent( 'on' + type, fn[ expandoProxy ] || fn );
 			}
 		};
 	}
@@ -542,9 +553,11 @@
 	});
 	each('addClass removeClass toggleClass setAttr removeAttr setCSS on off fire'.split(' '), function( val ) {
 		proto[ val ] = function() {
-			var node, i = 0;
+			var node, args, i = 0;
 			for ( ; node = this[i]; i++ ) {
-				minimal[ val ].apply( node, [node].concat(slice.call( arguments, 0 )) );
+				args = [ node ];
+				push.apply( args, arguments );
+				minimal[ val ].apply( node, args );
 			}
 			return this;
 		};
