@@ -23,7 +23,7 @@ test("noConflict()", function() {
 });
 
 test("Constructor", function() {
-	expect(10);
+	expect(12);
 
 	// Constructor behavior
 	equal( minimal().length, 0, 'minimal() === minimal([])' );
@@ -36,15 +36,13 @@ test("Constructor", function() {
 	equal( minimal('div.list').length, 1, 'Length property' );
 	equal( minimal('.list').length, 4, 'Multiple objects' );
 	equal( minimal( document.getElementById('foo') ).length, 1, 'Minimal takes elements' );
-	equal( minimal(document).length, 1, 'Minimal object of a document' );test("Element", function() {
+	equal( minimal(document).length, 1, 'Minimal object of a document' );
 
-	var foo = document.getElementById('foo');
-	strictEqual( minimal(foo)[0], foo, 'Passing an element leaves it' );
+	var element = document.getElementById('foo');
+	strictEqual( minimal(element)[0], element, 'Passing an element leaves it' );
 
-	var ul = document.getElementsByTagName('ul');
-	deepEqual( minimal(ul).length, ul.length, 'Passing an element leaves it' );
-});
-
+	var elements = document.getElementsByTagName('ul');
+	strictEqual( minimal(elements)[0], elements.item(0), 'Passing elements leave them' );
 });
 
 test("minimal.trim()", function() {

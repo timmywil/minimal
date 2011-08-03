@@ -52,35 +52,38 @@
 			return new minimal( selector, root );
 		}
 
+		this.length = 0;
+
 		if ( selector == null ) {
-			this.length = 0;
 			return;
 		}
 
 		if ( typeof selector === 'string' ) {
-			this.length = 0;
-			push.apply( this, queryAll( selector, root ) );
+			queryAll( selector, root, this );
 
 		} else if ( this[0] = selector.nodeType ? selector : selector.documentElement ) {
 			this.length = 1;
 
 		} else {
-			this.length = selector.length;
-			merge( this, selector );
+			pushElements( this, selector );
 		}
 	};
 
 	var proto = minimal.prototype;
 	proto[ ID ] = proto.version = '0.3pre';
 
+	proto.push = push;
+
 	var toArray = minimal.toArray = function( list ) {
-		var i = 0,
-			len = list.length,
-			ret = [];
-		for ( ; i < len; i++ ) {
-			ret[ i ] = list[ i ];
+		return merge( [], list );
+	};
+
+	var pushElements = function( one, two ) {
+		for ( var i = 0, j = 0; two[j]; ++j, ++i ) {
+			one[ i ] = two[ j ];
 		}
-		return ret;
+		one.length = i;
+		return one;
 	};
 
 	/**
@@ -93,18 +96,20 @@
 	 * @param {Element|String|null} root Either the owner document for the selection, an id, or null
 	 * @return {Array} Returns the matched elements in array form (not nodelist)
 	 */
-	var queryAll = function( selector, root ) {
+	var queryAll = function( selector, root, ret ) {
 		root = root && (typeof root === 'string' ? queryAll(root)[0] : root.nodeName ? root : root[0]) || document;
+		ret = ret || [];
 
 		if ( !selector || !root ) {
-			return [];
+			return ret;
 		}
 
-		var match, node, ret, mTag, mClass, i, j;
+		var match, node, mTag, mClass, i, j;
 
 		// ID
 		if ( match = rid.exec(selector) ) {
-			return ( node = root.getElementById( match[1] ) ) ? [ node ] : [];
+			node = root.getElementById( match[1] );
+			node && ret.push( node );
 
 		// Tag, Class, and Tag.Class
 		} else if ( match = rtagclass.exec(selector) ) {
@@ -113,22 +118,21 @@
 
 			// Tag
 			if ( !mClass ) {
-				return toArray( root.getElementsByTagName(mTag) );
+				return pushElements( ret, root.getElementsByTagName(mTag) );
 			}
 
 			// Class
 			if ( !mTag && root.getElementsByClassName ) {
-				return toArray( root.getElementsByClassName(mClass) );
+				return pushElements( ret, root.getElementsByClassName(mClass) );
 			}
 
 			// Tag.Class
 			if ( root.querySelectorAll ) {
-				return toArray( root.querySelectorAll( selector ) );
+				return pushElements( ret, root.querySelectorAll( selector ) );
 			}
 
 			// IE fallback
 			match = root.getElementsByTagName( mTag || '*' );
-			ret = [];
 			j = 0;
 			mClass = ' ' + mClass + ' ';
 			for ( ; node = match[ j ]; ++j ) {
@@ -136,11 +140,9 @@
 					ret.push( node );
 				}
 			}
-			return ret;
 
 		// Multiple selectors
 		} else {
-			ret = [];
 			selector = selector.split( rcomma );
 
 			// No split means selector not supported
@@ -149,10 +151,11 @@
 			}
 
 			for ( i = 0; node = selector[ i ]; ++i ) {
-				push.apply( ret, queryAll( node, root ) );
+				queryAll( node, root, ret );
 			}
-			return ret;
 		}
+
+		return ret;
 	};
 
 	/**
@@ -195,9 +198,20 @@
 
 	// Simplified merge & extend (merge expects numerical length, extend expects objects)
 	var merge = minimal.merge = function( one, two ) {
-		for ( var i = 0, len = two.length; i < len; i++ ) {
-			one[ i ] = two[ i ];
+		var i = 0,
+			len = two.length;
+
+		if ( typeof len === 'number' ) {
+			for ( ; i < len; ++i ) {
+				one[ i ] = two[ i ];
+			}
+
+		} else {
+			for ( ; two[i]; ++i ) {
+				one[ i ] = two[ i ];
+			}
 		}
+
 		return one;
 	};
 	var extend = minimal.extend = function( one, two ) {
@@ -548,7 +562,9 @@
 	// Add internal functions to the prototype
 	each('each forEach merge toArray indexOf'.split(' '), function( val ) {
 		proto[ val ] = function() {
-			return minimal[ val ].apply( this, [this].concat(slice.call( arguments, 0 )) );
+			var args = [ this ];
+			push.apply( args, arguments );
+			return minimal[ val ].apply( this, args );
 		};
 	});
 	each('addClass removeClass toggleClass setAttr removeAttr setCSS on off fire'.split(' '), function( val ) {
@@ -587,17 +603,22 @@
 	 */
 	extend(proto, {
 		slice: function( start, end ) {
-			return new minimal( slice.apply( toArray(this), arguments ) );
+			var ret = new minimal();
+			push.apply( ret, slice.apply( this, arguments ) );
+			return ret;
 		},
 		first: function() {
 			return this.slice(0, 1);
 		},
+		last: function() {
+			return this.slice(-1);
+		},
 		eq: function( index ) {
-			return this.slice( index, index + 1 );
+			return ~index ? this.slice( index, index + 1 ) : this.slice(-1);
 		},
 		find: function( selector ) {
 			var node, sel, j, el,
-				i = 0, ret = [];
+				i = 0, ret = new minimal();
 			for ( ; node = this[i]; i++ ) {
 				sel = queryAll( selector, rid.test(selector) ? document : node );
 				for ( j = 0; el = sel[ j ]; j++ ) {
@@ -606,18 +627,18 @@
 					}
 				}
 			}
-			return new minimal( ret );
+			return ret;
 		},
 		filter: function( fn ) {
 			var node,
-				ret = [],
+				ret = new minimal(),
 				i = 0;
 			for ( ; node = this[i]; i++ ) {
 				if ( fn.call(node, node, i) ) {
 					ret.push( node );
 				}
 			}
-			return new minimal( ret );
+			return ret;
 		}
 	});
 
