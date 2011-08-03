@@ -13,9 +13,9 @@
 		_query = window.query,
 
 		// Selector
-		rcomma = /[\s*]?,[\s*]?/,
+		rcomma = /\s*,\s*/,
 		rid = /^#([\w\-]+)$/,
-		rtagclass = /^(?:^([\w\-]+)$)|(?:^([\w]+)?\.([\w\-]+)$)/,
+		rtagclass = /^(?:([\w]+)|([\w]+)?\.([\w\-]+))$/,
 		
 		// Classes
 		rtrimLeft = /^\s+/,
@@ -32,10 +32,11 @@
 		ralpha = /alpha\([^)]*\)/i,
 
 		// Core
-		forEach = Array.prototype.forEach,
-		slice = Array.prototype.slice,
-		hasOwnProperty = Object.prototype.hasOwnProperty,
-		pindexOf = Array.prototype.indexOf;
+		forEach = [].forEach,
+		slice = [].slice,
+		push = [].push,
+		pindexOf = [].indexOf,
+		hasOwnProperty = ({}).hasOwnProperty;
 
 	/**
 	 * Main constructor
@@ -55,6 +56,7 @@
 
 	var proto = minimal.prototype;
 	proto.version = '0.3pre';
+	var expando = 'minimal' + proto.version + Math.random() * 9e17;
 
 	var toArray = minimal.toArray = function( list ) {
 		var i = 0,
@@ -106,6 +108,7 @@
 		// Tag, Class, and Tag.Class
 		} else if ( match = rtagclass.exec(selector) ) {
 
+			// Tag
 			if ( m = match[1] ) {
 				return toArray( root.getElementsByTagName(m) );
 			}
@@ -145,23 +148,19 @@
 			}
 
 			for ( i = 0; node = selector[ i ]; i++ ) {
-				ret = ret.concat( queryAll( node, root ) );
+				push.apply( ret, queryAll(node, root) );
 			}
 			return ret;
 		}
 	};
 
-	/**
-	 * Retrieves the first of the matched set in a query
-	 */
+	// Retrieves the first of the matched set in a query
 	var query = function( selector, root ) {
 		return queryAll( selector, root )[0];
 	};
 
 
-	/**
-	 * An implementaton of each based off underscore.js
-	 */
+	// An implementaton of each based off underscore.js
 	var each = minimal.each = minimal.forEach = function( obj, iterator, context ) {
 		var key, len;
 		if ( !obj ) {
@@ -209,7 +208,10 @@
 			return pindexOf.call( array, searchElement, fromIndex );
 		} :
 		function( array, searchElement, fromIndex ) {
-			for ( var i = fromIndex || 0, len = array.length; i < len; i++ ) {
+			var len = array.length,
+				i = fromIndex ? fromIndex < 0 ? Math.max( 0, len + fromIndex ) : fromIndex : 0;
+
+			for ( ; i < len; ++i ) {
 				if ( array[ i ] === searchElement ) {
 					return i;
 				}
@@ -479,7 +481,7 @@
 	/**
 	 * Events
 	 */
-	var on, off, fnCache, preventDefault, stopPropogation;
+	var on, off, preventDefault, stopPropogation;
 	if ( document.addEventListener ) {
 		on = function( node, type, fn ) {
 			if ( node.addEventListener ) {
@@ -494,25 +496,24 @@
 
 	// IE
 	} else {
-		fnCache = {}; // used for event context
 		preventDefault = function() { this.returnValue = false; };
 		stopPropagation = function() { this.cancelBubble = true; };
 		on = function( node, type, fn ) {
 			var f;
 			if ( node.attachEvent ) {
-				f = fnCache[ fn ] = function( e ) {
+				f = fn[ expando ] || (fn[ expando ] = function( e ) {
 					if ( typeof e.preventDefault !== 'function' ) {
 						e.preventDefault = preventDefault;
 						e.stopPropagation = stopPropagation;
 					}
 					fn.call( node, e );
-				};
+				});
 				node.attachEvent( 'on' + type, f );
 			}
 		};
 		off = function( node, type, fn ) {
 			if ( node.detachEvent ) {
-				node.detachEvent( 'on' + type, fnCache[ fn ] || fn );
+				node.detachEvent( 'on' + type, fn[ expando ] || fn );
 			}
 		};
 	}
@@ -537,14 +538,18 @@
 	// Add internal functions to the prototype
 	each('each forEach merge toArray indexOf'.split(' '), function( val ) {
 		proto[ val ] = function() {
-			return minimal[ val ].apply( this, [this].concat(slice.call( arguments, 0 )) );
+			var args = [ this ];
+			push.apply( args, arguments );
+			return minimal[ val ].apply( this, args );
 		};
 	});
 	each('addClass removeClass toggleClass setAttr removeAttr setCSS on off fire'.split(' '), function( val ) {
 		proto[ val ] = function() {
-			var node, i = 0;
+			var node, args, i = 0;
 			for ( ; node = this[i]; i++ ) {
-				minimal[ val ].apply( node, [node].concat(slice.call( arguments, 0 )) );
+				args = [ node ];
+				push.apply( args, arguments );
+				minimal[ val ].apply( node, args );
 			}
 			return this;
 		};

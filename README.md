@@ -5,7 +5,8 @@ The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.6k mi
 
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
-### Supported browsers: IE6+, Firefox 3.0+, Chrome, Safari, Opera, blahblah
+### Supported browsers: IE6+, Firefox 3.0+, Chrome, Safari, Opera,
+### Webkit Mobile(Safari, Android, Blackberry, Palm, and Nokia), Opera mobile
 
 ## About this repo
 
@@ -110,6 +111,10 @@ ___Note___: The iterator function is passed arguments in the order of value then
 ###minimal.indexOf( array, searchElement[, fromIndex]) & .indexOf( searchElement[, fromIndex])
 
 This uses the native [`Array.prototype.indexOf`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf) if available and works the same way. If the given searchElement is in the array (or current minimal object), the index of that element will be returned, otherwise -1.
+
+	minimal.indexOf([1, 2, 3, 4, 5, 6, 7], 3); ==> 2
+	minimal('div').indexOf( query('#foo') ); ==> index of the element with an id of foo in the selection
+	minimal('div.wrapper').indexOf( query('#bar'), 3 ); ==> index of the element with an id of bar in the selection, but skip checking the first three selected wrapper elements
 
 
 ###minimal.trim( str )
@@ -383,3 +388,12 @@ Trigger an event on the matched elements.
 	- Mostly just creating an xhr object across browsers for the user and letting the user take it from there.
 2. Node __manipulation__ for appending and cloning elements.
 	- The most common things don't really need a library, so this may not be right for minimal.
+
+
+##Changelog
+
+v0.1 - Core, Classes, Attributes, Traversing (w/o filter), and Events<br>
+v0.2 - Full-scale CSS component, window/document dimensions, and `.filter()`
+
+v0.3pre<br>
+- Some optimizations with suggestions from @rkatic including minor performance improvements for multiple selectors and most of the prototype bindings, negative fromIndex support in IE for `minimal.indexOf`, and some byte conservation.
