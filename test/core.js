@@ -31,12 +31,19 @@ test("Constructor", function() {
 	equal( minimal(undefined).length, 0, 'minimal(undefined) === minimal([])' );
 	equal( minimal(null).length, 0, 'minimal(null) === minimal([])' );
 	equal( minimal('').length, 0, 'minimal("") === minimal([])' );
-	
+
 	ok( minimal('#foo') instanceof minimal, 'Self instantiated' );
 	equal( minimal('div.list').length, 1, 'Length property' );
 	equal( minimal('.list').length, 4, 'Multiple objects' );
 	equal( minimal( document.getElementById('foo') ).length, 1, 'Minimal takes elements' );
-	equal( minimal(document).length, 1, 'Minimal object of a document' );
+	equal( minimal(document).length, 1, 'Minimal object of a document' );test("Element", function() {
+
+	var foo = document.getElementById('foo');
+	strictEqual( minimal(foo)[0], foo, 'Passing an element leaves it' );
+
+	var ul = document.getElementsByTagName('ul');
+	deepEqual( minimal(ul).length, ul.length, 'Passing an element leaves it' );
+});
 
 });
 
@@ -71,7 +78,7 @@ test("toArray()", function() {
 });
 
 test("indexOf()", function() {
-	
+
 	expect(15);
 
 	var selections = {
