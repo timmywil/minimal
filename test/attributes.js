@@ -47,7 +47,7 @@ test("getAttr()", function() {
 
 	equal( minimal().getAttr("doesntexist"), null, "Make sure null is returned when no element is there." );
 
-	strictEqual( minimal('#firstp').getAttr('nonexisting'), undefined, 'getAttr works correctly for non existing attributes' );
+	strictEqual( minimal('#firstp').getAttr('nonexisting'), null, 'getAttr works correctly for non existing attributes' );
 });
 
 
