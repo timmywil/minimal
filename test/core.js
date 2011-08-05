@@ -149,8 +149,7 @@ test('minimal.each', function() {
 test("minimal.merge", function() {
 
 	deepEqual( minimal.merge([], [1, 2, 3, 4, 5]), [1, 2, 3, 4, 5], 'Merge two arrays' );
-	deepEqual( minimal.merge([1, 2], [3, 4]), [3, 4], 'The second array gets priority' );
-	deepEqual( minimal('.list').merge( queryAll('#foo') ).toArray(), q('foo', 'listTwo', 'listThree', 'listFiveDiv'), 'Merging a minimal object with an array' );
-	deepEqual( minimal('li.list').merge( minimal('div.list') ).toArray(), q('listFiveDiv', 'listTwo', 'listThree'),'Merging a minimal object with another')
+	deepEqual( minimal.merge([1, 2], [3, 4]), [1, 2, 3, 4], 'Values from the second array pushed back' );
+	deepEqual( minimal('.list').merge( queryAll('#foo') ).toArray(), q('listOne', 'listTwo', 'listThree', 'listFiveDiv', 'foo'), 'Merging a minimal object with an array' );
 
 });

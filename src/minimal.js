@@ -65,7 +65,7 @@
 			this.length = 1;
 
 		} else {
-			pushElements( this, selector );
+			merge( this, selector );
 		}
 	};
 
@@ -76,14 +76,6 @@
 
 	var toArray = minimal.toArray = function( list ) {
 		return merge( [], list );
-	};
-
-	var pushElements = function( one, two ) {
-		for ( var i = one.length, j = 0; two[j]; ++j, ++i ) {
-			one[ i ] = two[ j ];
-		}
-		one.length = i;
-		return one;
 	};
 
 	/**
@@ -119,17 +111,17 @@
 
 			// Tag
 			if ( !mClass ) {
-				return pushElements( ret, root.getElementsByTagName(mTag) );
+				return merge( ret, root.getElementsByTagName(mTag) );
 			}
 
 			// Class
 			if ( !mTag && root.getElementsByClassName ) {
-				return pushElements( ret, root.getElementsByClassName(mClass) );
+				return merge( ret, root.getElementsByClassName(mClass) );
 			}
 
 			// Tag.Class
 			if ( root.querySelectorAll ) {
-				return pushElements( ret, root.querySelectorAll( selector ) );
+				return merge( ret, root.querySelectorAll( selector ) );
 			}
 
 			// IE fallback
@@ -199,19 +191,22 @@
 
 	// Simplified merge & extend (merge expects numerical length, extend expects objects)
 	var merge = minimal.merge = function( one, two ) {
-		var i = 0,
+		var i = one.length,
+			j = 0,
 			len = two.length;
 
 		if ( typeof len === 'number' ) {
-			for ( ; i < len; ++i ) {
-				one[ i ] = two[ i ];
+			for ( ; j < len; ++j ) {
+				one[ i++ ] = two[ j ];
 			}
 
 		} else {
-			for ( ; two[i]; ++i ) {
-				one[ i ] = two[ i ];
+			for ( ; two[j]; ++i ) {
+				one[ i++ ] = two[ j ];
 			}
 		}
+
+		one.length = i;
 
 		return one;
 	};
