@@ -79,7 +79,7 @@
 	};
 
 	var pushElements = function( one, two ) {
-		for ( var i = 0, j = 0; two[j]; ++j, ++i ) {
+		for ( var i = one.length, j = 0; two[j]; ++j, ++i ) {
 			one[ i ] = two[ j ];
 		}
 		one.length = i;
