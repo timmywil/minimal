@@ -88,7 +88,7 @@ test("setAttr()", function() {
 	minimal.each([commentNode, textNode, attributeNode], function( i, elem ) {
 		var $elem = minimal( elem );
 		$elem.setAttr( 'nonexisting', 'foo' );
-		strictEqual( $elem.getAttr('nonexisting'), null, 'setAttr works correctly on comment and text nodes' );
+		strictEqual( $elem.getAttr('nonexisting'), undefined, 'setAttr works correctly on comment and text nodes' );
 	});
 
 
