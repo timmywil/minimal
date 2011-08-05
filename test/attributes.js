@@ -91,8 +91,6 @@ test("setAttr()", function() {
 		strictEqual( $elem.getAttr('nonexisting'), undefined, 'setAttr works correctly on comment and text nodes' );
 	});
 
-
-
 	var table = minimal('#table1'),
 		td = minimal('td', table).first();
 	td.setAttr('rowspan', '2');

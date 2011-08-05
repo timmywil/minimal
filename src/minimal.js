@@ -151,17 +151,13 @@
 		return ret;
 	};
 
-	/**
-	 * Retrieves the first of the matched set in a query
-	 */
+	// Retrieves the first of the matched set in a query
 	var query = function( selector, root ) {
 		return queryAll( selector, root )[0];
 	};
 
 
-	/**
-	 * An implementaton of each based off underscore.js
-	 */
+	// An implementaton of each based off underscore.js
 	var each = minimal.each = minimal.forEach = function( obj, iterator, context ) {
 		var key, len;
 		if ( !obj ) {
@@ -223,11 +219,8 @@
 			return pindexOf.call( array, searchElement, fromIndex );
 		} :
 		function( array, searchElement, fromIndex ) {
-			var i = 0, len = array.length;
-
-			if ( fromIndex != null ) {
-				i = fromIndex < 0 ? Math.max( 0, len + fromIndex ) : fromIndex;
-			}
+			var len = array.length,
+				i = fromIndex ? fromIndex < 0 ? Math.max( 0, len + fromIndex ) : fromIndex : 0;
 
 			for ( ; i < len; ++i ) {
 				if ( array[ i ] === searchElement ) {
@@ -515,7 +508,6 @@
 
 	// IE
 	} else {
-		fnCache = {}; // used for event context
 		preventDefault = function() { this.returnValue = false; };
 		stopPropagation = function() { this.cancelBubble = true; };
 		on = function( node, type, fn ) {

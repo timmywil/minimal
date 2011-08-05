@@ -76,8 +76,7 @@ test("toArray()", function() {
 });
 
 test("indexOf()", function() {
-
-	expect(15);
+	expect(35);
 
 	var selections = {
 		p:   q('firstp', 'en', 'sap', 'lastp'),
@@ -100,9 +99,16 @@ test("indexOf()", function() {
 
 	minimal.each( tests, function( obj, key ) {
 		equal( minimal.indexOf( selections[ key ], obj.elem ), obj.index, obj.elem + ' is in the array of selections of its tag' );
+		equal( minimal(selections[ key ]).indexOf( obj.elem ), obj.index, obj.elem + ' is in the array of selections of its tag' );
+
 		// Third arg
 		equal( !!~minimal.indexOf( selections[ key ], obj.elem, 5 ), false, obj.elem + ' is NOT in the array of selections given a starting index greater than its position' );
 		equal( !!~minimal.indexOf( selections[ key ], obj.elem, 1 ), true, obj.elem + ' is in the array of selections given a starting index less than or equal to its position' );
+		equal( !!~minimal.indexOf( selections[ key ], obj.elem, -3 ), true, obj.elem + ' is in the array of selections given with a negative fromIndex' );
+
+		equal( !!~minimal(selections[ key ]).indexOf( obj.elem, 5 ), false, obj.elem + ' is NOT in the array of selections given a starting index greater than its position' );
+		equal( !!~minimal(selections[ key ]).indexOf( obj.elem, 1 ), true, obj.elem + ' is in the array of selections given a starting index less than or equal to its position' );
+		equal( !!~minimal(selections[ key ]).indexOf( obj.elem, -3 ), true, obj.elem + ' is in the array of selections given with a negative fromIndex' );
 	});
 
 	minimal.each( falseTests, function( elem, key ) {
