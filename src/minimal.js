@@ -110,6 +110,7 @@
 		if ( match = rid.exec(selector) ) {
 			node = root.getElementById( match[1] );
 			node && ret.push( node );
+			return ret;
 
 		// Tag, Class, and Tag.Class
 		} else if ( match = rtagclass.exec(selector) ) {
