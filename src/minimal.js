@@ -258,7 +258,7 @@
 			return ptrim.call( str );
 		} :
 		function( str ) {
-			return str.replace( rtrimLeft, '' ).replace( rtrimRight, '' );
+			return ( '' + str ).replace( rtrimLeft, '' ).replace( rtrimRight, '' );
 		};
 
 
