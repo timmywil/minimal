@@ -230,7 +230,7 @@
 				i = fromIndex ? fromIndex < 0 ? Math.max( 0, len + fromIndex ) : fromIndex : 0;
 
 			for ( ; i < len; ++i ) {
-				if ( array[ i ] === searchElement ) {
+				if ( i in array && array[ i ] === searchElement ) {
 					return i;
 				}
 			}
