@@ -189,10 +189,10 @@
 	var merge = minimal.merge = function( one, two ) {
 		var i = one.length,
 			j = 0,
-			len = two.length;
+			len;
 
 		if ( typeof len === 'number' ) {
-			for ( ; j < len; ++j ) {
+			for ( len = two.length; j < len; ++j ) {
 				one[ i++ ] = two[ j ];
 			}
 
