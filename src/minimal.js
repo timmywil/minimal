@@ -36,6 +36,7 @@
 		slice = [].slice,
 		push = [].push,
 		pindexOf = [].indexOf,
+		indexOf,
 		hasOwnProperty = ({}).hasOwnProperty,
 
 		ID = 'minimal@timmywillison.com';
@@ -219,11 +220,12 @@
 	};
 
 	// Checks if an item is within an array
-	var indexOf = minimal.indexOf = pindexOf ?
-		function( array, searchElement, fromIndex ) {
+	if ( pindexOf ) {
+		indexOf = Array.indexOf || function( array, searchElement, fromIndex ) {
 			return pindexOf.call( array, searchElement, fromIndex );
-		} :
-		function( array, searchElement, fromIndex ) {
+		};
+	} else {
+		indexOf = function( array, searchElement, fromIndex ) {
 			var len = array.length,
 				i = fromIndex ? fromIndex < 0 ? Math.max( 0, len + fromIndex ) : fromIndex : 0;
 
@@ -235,6 +237,14 @@
 
 			return -1;
 		};
+
+		pindexOf = function( searchElement, fromIndex ) {
+			return indexOf( this, searchElement, fromIndex );
+		};
+	}
+
+	minimal.indexOf = indexOf;
+	proto.indexOf = pindexOf;
 
 	// IE doesn't match non-breaking spaces with \s
 	if ( /\S/.test( "\xA0" ) ) {
@@ -553,7 +563,7 @@
 	minimal.fire = fire;
 
 	// Add internal functions to the prototype
-	each('each forEach merge indexOf'.split(' '), function( val ) {
+	each('each forEach merge'.split(' '), function( val ) {
 		proto[ val ] = function() {
 			var args = [ this ];
 			push.apply( args, arguments );
