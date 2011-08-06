@@ -78,6 +78,11 @@
 		return merge( [], list );
 	};
 
+	//A faster toArray for minimal instances (native objects).
+	proto.toArray = function() {
+		return slice.call( this, 0 );
+	};
+
 	/**
 	 * A short simple selector engine
 	 * Never use descendants (although setting context is allowed) and only use id, tag, tag.class, or .class
@@ -197,7 +202,7 @@
 			}
 
 		} else {
-			for ( ; two[j]; ++i ) {
+			for ( ; two[j]; ++j ) {
 				one[ i++ ] = two[ j ];
 			}
 		}
@@ -548,7 +553,7 @@
 	minimal.fire = fire;
 
 	// Add internal functions to the prototype
-	each('each forEach merge toArray indexOf'.split(' '), function( val ) {
+	each('each forEach merge indexOf'.split(' '), function( val ) {
 		proto[ val ] = function() {
 			var args = [ this ];
 			push.apply( args, arguments );
