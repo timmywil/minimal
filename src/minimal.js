@@ -268,21 +268,24 @@
 	 */
 	var addClass = minimal.addClass = function( node, classStr ) {
 		classStr = classStr.split( rspaces );
-		var cls = ' ' + node.className + ' ';
+		var cls = ' ' + node.className + ' ', changed;
 		for ( var i = 0, len = classStr.length, c; i < len; ++i ) {
 			c = classStr[ i ];
 			if ( c && cls.indexOf(' ' + c + ' ') < 0 ) {
 				cls += c + ' ';
+				changed = true;
 			}
 		}
-		node.className = trim( cls );
+		if ( changed ) {
+			node.className = trim( cls );
+		}
 	};
 
 	var removeClass = minimal.removeClass = function( node, classStr ) {
-		var cls;
+		var prevCls = node.className, cls;
 		if ( classStr !== undefined ) {
 			classStr = classStr.split( rspaces );
-			cls = ' ' + node.className + ' ';
+			cls = ' ' + prevCls + ' ';
 			for ( var i = 0, len = classStr.length; i < len; ++i ) {
 				cls = cls.replace(' ' + classStr[ i ] + ' ', ' ');
 			}
@@ -290,18 +293,23 @@
 		} else {
 			cls = '';
 		}
-		if ( node.className !== cls ) {
+		if ( prevCls !== cls ) {
 			node.className = cls;
 		}
 	};
 
 	minimal.toggleClass = function( node, classStr ) {
+		classStr = classStr.split( rspaces );
 		var cls = ' ' + node.className + ' ';
-		if ( ~cls.indexOf(' ' + trim( classStr ) + ' ') ) {
-			removeClass( node, classStr );
-		} else {
-			addClass( node, classStr );
+		for ( var i = 0, len = classStr.length, c; i < len; ++i ) {
+			c = classStr[ i ];
+			if ( ~cls.indexOf(' ' + c + ' ') ) {
+				cls = cls.replace(' ' + c + ' ', ' ');
+			} else {
+				cls += c + ' ';
+			}
 		}
+		node.className = cls;
 	};
 
 	var hasClass = minimal.hasClass = function( node, classStr ) {
