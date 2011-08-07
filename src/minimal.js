@@ -197,7 +197,7 @@
 			j = 0,
 			len;
 
-		if ( typeof len === 'number' ) {
+		if ( typeof two.length === 'number' ) {
 			for ( len = two.length; j < len; ++j ) {
 				one[ i++ ] = two[ j ];
 			}
