@@ -23,7 +23,7 @@ test("noConflict()", function() {
 });
 
 test("Constructor", function() {
-	expect(10);
+	expect(12);
 
 	// Constructor behavior
 	equal( minimal().length, 0, 'minimal() === minimal([])' );
@@ -31,13 +31,18 @@ test("Constructor", function() {
 	equal( minimal(undefined).length, 0, 'minimal(undefined) === minimal([])' );
 	equal( minimal(null).length, 0, 'minimal(null) === minimal([])' );
 	equal( minimal('').length, 0, 'minimal("") === minimal([])' );
-	
+
 	ok( minimal('#foo') instanceof minimal, 'Self instantiated' );
 	equal( minimal('div.list').length, 1, 'Length property' );
 	equal( minimal('.list').length, 4, 'Multiple objects' );
 	equal( minimal( document.getElementById('foo') ).length, 1, 'Minimal takes elements' );
 	equal( minimal(document).length, 1, 'Minimal object of a document' );
 
+	var element = document.getElementById('foo');
+	strictEqual( minimal(element)[0], element, 'Passing an element leaves it' );
+
+	var elements = document.getElementsByTagName('ul');
+	strictEqual( minimal(elements)[0], elements.item(0), 'Passing elements leave them' );
 });
 
 test("minimal.trim()", function() {
@@ -71,7 +76,6 @@ test("toArray()", function() {
 });
 
 test("indexOf()", function() {
-	
 	expect(35);
 
 	var selections = {
@@ -151,8 +155,7 @@ test('minimal.each', function() {
 test("minimal.merge", function() {
 
 	deepEqual( minimal.merge([], [1, 2, 3, 4, 5]), [1, 2, 3, 4, 5], 'Merge two arrays' );
-	deepEqual( minimal.merge([1, 2], [3, 4]), [3, 4], 'The second array gets priority' );
-	deepEqual( minimal('.list').merge( queryAll('#foo') ).toArray(), q('foo', 'listTwo', 'listThree', 'listFiveDiv'), 'Merging a minimal object with an array' );
-	deepEqual( minimal('li.list').merge( minimal('div.list') ).toArray(), q('listFiveDiv', 'listTwo', 'listThree'),'Merging a minimal object with another')
+	deepEqual( minimal.merge([1, 2], [3, 4]), [1, 2, 3, 4], 'Values from the second array pushed back' );
+	deepEqual( minimal('.list').merge( queryAll('#foo') ).toArray(), q('listOne', 'listTwo', 'listThree', 'listFiveDiv', 'foo'), 'Merging a minimal object with an array' );
 
 });

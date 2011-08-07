@@ -16,7 +16,7 @@
 		rcomma = /\s*,\s*/,
 		rid = /^#([\w\-]+)$/,
 		rtagclass = /^(?:([\w]+)|([\w]+)?\.([\w\-]+))$/,
-		
+
 		// Classes
 		rtrimLeft = /^\s+/,
 		rtrimRight = /\s+$/,
@@ -36,7 +36,12 @@
 		slice = [].slice,
 		push = [].push,
 		pindexOf = [].indexOf,
-		hasOwnProperty = ({}).hasOwnProperty;
+		indexOf,
+		hasOwnProperty = ({}).hasOwnProperty,
+
+		ID = 'minimal@timmywillison.com';
+
+		expandoProxy = ID + "/proxy";
 
 	/**
 	 * Main constructor
@@ -44,28 +49,39 @@
 	var minimal = function( selector, root ) {
 
 		// Self-instantiate if not instantiated
-		if ( !this.version ) {
+		if ( !this[ ID ] ) {
 			return new minimal( selector, root );
 		}
 
-		var selection = queryAll( selector, root );
+		this.length = 0;
 
-		this.length = selection.length;
-		merge( this, selection );
+		if ( selector == null ) {
+			return;
+		}
+
+		if ( typeof selector === 'string' ) {
+			queryAll( selector, root, this );
+
+		} else if ( this[0] = selector.nodeType ? selector : selector.documentElement ) {
+			this.length = 1;
+
+		} else {
+			merge( this, selector );
+		}
 	};
 
 	var proto = minimal.prototype;
-	proto.version = '0.3pre';
-	var expando = 'minimal' + proto.version + Math.random() * 9e17;
+	proto[ ID ] = proto.version = '0.3pre';
+
+	proto.push = push;
 
 	var toArray = minimal.toArray = function( list ) {
-		var i = 0,
-			len = list.length,
-			ret = [];
-		for ( ; i < len; i++ ) {
-			ret[ i ] = list[ i ];
-		}
-		return ret;
+		return merge( [], list );
+	};
+
+	//A faster toArray for minimal instances (native objects).
+	proto.toArray = function() {
+		return slice.call( this, 0 );
 	};
 
 	/**
@@ -78,68 +94,54 @@
 	 * @param {Element|String|null} root Either the owner document for the selection, an id, or null
 	 * @return {Array} Returns the matched elements in array form (not nodelist)
 	 */
-	var queryAll = function( selector, root ) {
+	var queryAll = function( selector, root, ret ) {
 		root = root && (typeof root === 'string' ? queryAll(root)[0] : root.nodeName ? root : root[0]) || document;
+		ret = ret || [];
 
 		if ( !selector || !root ) {
-			return [];
+			return ret;
 		}
 
-		if ( typeof selector !== 'string' ) {
-			if ( selector.style ) {
-				// An element that is not the window or document
-				return [ selector ];
-			}
-
-			if ( selector.documentElement ) {
-				// The document
-				return [ selector.documentElement ];
-			}
-
-			return toArray( selector );
-		}
-
-		var match, node, ret, m, i, j;
+		var match, node, mTag, mClass, i, j;
 
 		// ID
 		if ( match = rid.exec(selector) ) {
-			return ( node = root.getElementById( match[1] ) ) ? [ node ] : [];
+			node = root.getElementById( match[1] );
+			node && ret.push( node );
+			return ret;
 
 		// Tag, Class, and Tag.Class
 		} else if ( match = rtagclass.exec(selector) ) {
+			mTag = match[1] || match[2];
+			mClass = match[3];
 
 			// Tag
-			if ( m = match[1] ) {
-				return toArray( root.getElementsByTagName(m) );
+			if ( !mClass ) {
+				return merge( ret, root.getElementsByTagName(mTag) );
 			}
 
-			m = match[3];
-
 			// Class
-			if ( !match[2] && root.getElementsByClassName ) {
-				return toArray( root.getElementsByClassName(m) );
+			if ( !mTag && root.getElementsByClassName ) {
+				return merge( ret, root.getElementsByClassName(mClass) );
 			}
 
 			// Tag.Class
 			if ( root.querySelectorAll ) {
-				return toArray( root.querySelectorAll( selector ) );
+				return merge( ret, root.querySelectorAll( selector ) );
 			}
 
 			// IE fallback
-			match = root.getElementsByTagName( match[2] || '*' );
-			ret = [];
+			match = root.getElementsByTagName( mTag || '*' );
 			j = 0;
-			m = ' ' + m + ' ';
-			for ( ; node = match[ j ]; j++ ) {
-				if ( ~(' ' + node.className + ' ').indexOf( m ) ) {
+			mClass = ' ' + mClass + ' ';
+			for ( ; node = match[ j ]; ++j ) {
+				if ( ~(' ' + node.className + ' ').indexOf( mClass ) ) {
 					ret.push( node );
 				}
 			}
-			return ret;
 
 		// Multiple selectors
 		} else {
-			ret = [];
 			selector = selector.split( rcomma );
 
 			// No split means selector not supported
@@ -147,11 +149,12 @@
 				throw 'Invalid selector: ' + selector;
 			}
 
-			for ( i = 0; node = selector[ i ]; i++ ) {
-				push.apply( ret, queryAll(node, root) );
+			for ( i = 0; node = selector[ i ]; ++i ) {
+				queryAll( node, root, ret );
 			}
-			return ret;
 		}
+
+		return ret;
 	};
 
 	// Retrieves the first of the matched set in a query
@@ -190,9 +193,23 @@
 
 	// Simplified merge & extend (merge expects numerical length, extend expects objects)
 	var merge = minimal.merge = function( one, two ) {
-		for ( var i = 0, len = two.length; i < len; i++ ) {
-			one[ i ] = two[ i ];
+		var i = one.length,
+			j = 0,
+			len;
+
+		if ( typeof two.length === 'number' ) {
+			for ( len = two.length; j < len; ++j ) {
+				one[ i++ ] = two[ j ];
+			}
+
+		} else {
+			for ( ; two[j]; ++j ) {
+				one[ i++ ] = two[ j ];
+			}
 		}
+
+		one.length = i;
+
 		return one;
 	};
 	var extend = minimal.extend = function( one, two ) {
@@ -203,21 +220,31 @@
 	};
 
 	// Checks if an item is within an array
-	var indexOf = minimal.indexOf = pindexOf ?
-		function( array, searchElement, fromIndex ) {
+	if ( pindexOf ) {
+		indexOf = Array.indexOf || function( array, searchElement, fromIndex ) {
 			return pindexOf.call( array, searchElement, fromIndex );
-		} :
-		function( array, searchElement, fromIndex ) {
+		};
+	} else {
+		indexOf = function( array, searchElement, fromIndex ) {
 			var len = array.length,
 				i = fromIndex ? fromIndex < 0 ? Math.max( 0, len + fromIndex ) : fromIndex : 0;
 
 			for ( ; i < len; ++i ) {
-				if ( array[ i ] === searchElement ) {
+				if ( i in array && array[ i ] === searchElement ) {
 					return i;
 				}
 			}
+
 			return -1;
 		};
+
+		pindexOf = function( searchElement, fromIndex ) {
+			return indexOf( this, searchElement, fromIndex );
+		};
+	}
+
+	minimal.indexOf = indexOf;
+	proto.indexOf = pindexOf;
 
 	// IE doesn't match non-breaking spaces with \s
 	if ( /\S/.test( "\xA0" ) ) {
@@ -231,7 +258,7 @@
 			return ptrim.call( str );
 		} :
 		function( str ) {
-			return str.replace( rtrimLeft, '' ).replace( rtrimRight, '' );
+			return ( '' + str ).replace( rtrimLeft, '' ).replace( rtrimRight, '' );
 		};
 
 
@@ -241,21 +268,24 @@
 	 */
 	var addClass = minimal.addClass = function( node, classStr ) {
 		classStr = classStr.split( rspaces );
-		var cls = ' ' + node.className + ' ';
+		var cls = ' ' + node.className + ' ', changed;
 		for ( var i = 0, len = classStr.length, c; i < len; ++i ) {
 			c = classStr[ i ];
 			if ( c && cls.indexOf(' ' + c + ' ') < 0 ) {
 				cls += c + ' ';
+				changed = true;
 			}
 		}
-		node.className = trim( cls );
+		if ( changed ) {
+			node.className = trim( cls );
+		}
 	};
 
 	var removeClass = minimal.removeClass = function( node, classStr ) {
-		var cls;
+		var prevCls = node.className, cls;
 		if ( classStr !== undefined ) {
 			classStr = classStr.split( rspaces );
-			cls = ' ' + node.className + ' ';
+			cls = ' ' + prevCls + ' ';
 			for ( var i = 0, len = classStr.length; i < len; ++i ) {
 				cls = cls.replace(' ' + classStr[ i ] + ' ', ' ');
 			}
@@ -263,23 +293,38 @@
 		} else {
 			cls = '';
 		}
-		if ( node.className !== cls ) {
+		if ( prevCls !== cls ) {
 			node.className = cls;
 		}
 	};
 
 	minimal.toggleClass = function( node, classStr ) {
+		classStr = classStr.split( rspaces );
 		var cls = ' ' + node.className + ' ';
-		if ( ~cls.indexOf(' ' + trim( classStr ) + ' ') ) {
-			removeClass( node, classStr );
-		} else {
-			addClass( node, classStr );
+		for ( var i = 0, len = classStr.length, c; i < len; ++i ) {
+			c = classStr[ i ];
+			if ( ~cls.indexOf(' ' + c + ' ') ) {
+				cls = cls.replace(' ' + c + ' ', ' ');
+			} else {
+				cls += c + ' ';
+			}
 		}
+		node.className = cls;
 	};
 
 	var hasClass = minimal.hasClass = function( node, classStr ) {
-		return node && classStr &&
-			!!~(' ' + node.className + ' ').indexOf( ' ' + classStr + ' ' );
+		if ( !node || !classStr ) {
+			return false;
+		}
+
+		var cls = ' ' + node.className + ' ';
+		classStr = classStr.split( rspaces );
+		for ( var i = 0, len = classStr.length; i < len; ++i ) {
+			if ( !~cls.indexOf( ' ' + classStr[i] + ' ' ) ) {
+				return false;
+			}
+		}
+		return true;
 	};
 
 
@@ -501,7 +546,7 @@
 		on = function( node, type, fn ) {
 			var f;
 			if ( node.attachEvent ) {
-				f = fn[ expando ] || (fn[ expando ] = function( e ) {
+				f = fn[ expandoProxy ] || ( fn[ expandoProxy ] = function( e ) {
 					if ( typeof e.preventDefault !== 'function' ) {
 						e.preventDefault = preventDefault;
 						e.stopPropagation = stopPropagation;
@@ -513,7 +558,7 @@
 		};
 		off = function( node, type, fn ) {
 			if ( node.detachEvent ) {
-				node.detachEvent( 'on' + type, fn[ expando ] || fn );
+				node.detachEvent( 'on' + type, fn[ expandoProxy ] || fn );
 			}
 		};
 	}
@@ -536,7 +581,7 @@
 	minimal.fire = fire;
 
 	// Add internal functions to the prototype
-	each('each forEach merge toArray indexOf'.split(' '), function( val ) {
+	each('each forEach merge'.split(' '), function( val ) {
 		proto[ val ] = function() {
 			var args = [ this ];
 			push.apply( args, arguments );
@@ -579,17 +624,22 @@
 	 */
 	extend(proto, {
 		slice: function( start, end ) {
-			return new minimal( slice.apply( toArray(this), arguments ) );
+			var ret = new minimal();
+			push.apply( ret, slice.apply( this, arguments ) );
+			return ret;
 		},
 		first: function() {
 			return this.slice(0, 1);
 		},
+		last: function() {
+			return this.slice(-1);
+		},
 		eq: function( index ) {
-			return this.slice( index, index + 1 );
+			return ~index ? this.slice( index, index + 1 ) : this.slice(-1);
 		},
 		find: function( selector ) {
 			var node, sel, j, el,
-				i = 0, ret = [];
+				i = 0, ret = new minimal();
 			for ( ; node = this[i]; i++ ) {
 				sel = queryAll( selector, rid.test(selector) ? document : node );
 				for ( j = 0; el = sel[ j ]; j++ ) {
@@ -598,18 +648,18 @@
 					}
 				}
 			}
-			return new minimal( ret );
+			return ret;
 		},
 		filter: function( fn ) {
 			var node,
-				ret = [],
+				ret = new minimal(),
 				i = 0;
 			for ( ; node = this[i]; i++ ) {
 				if ( fn.call(node, node, i) ) {
 					ret.push( node );
 				}
 			}
-			return new minimal( ret );
+			return ret;
 		}
 	});
 

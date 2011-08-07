@@ -20,12 +20,6 @@ test("CLASS", function() {
 	t( 'div.list', [ 'listFiveDiv' ], 'Checks tag.class selector' );
 });
 
-test("Element", function() {
-	expect(4);
-	t( document.getElementById('foo'), [ 'foo' ], 'Passing an element leaves it' );
-	t( document.getElementsByTagName('ul'), [ 'unorderedList' ], 'Passing elements leave them' );
-});
-
 test("Rooted Selections", function() {
 	expect(3);
 	equal( queryAll('div', '#parent')[0].id, 'child', '#parent passed as root for child div' );

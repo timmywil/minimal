@@ -26,7 +26,7 @@ test("getAttr()", function() {
 	equal( minimal('#form1').setAttr('target', 'newTarget').getAttr('target'), 'newTarget', 'Set target successfully on a form' );
 	equal( minimal('#form1').removeAttr('id').getAttr('id'), null, 'Retrieving id does not equal the input with name=id after id is removed' );
 	equal( minimal('#form1').getAttr('name'), null, 'Retrieving name does not retrieve input with name=name' );
-	
+
 	equal( minimal('#text1').getAttr('maxlength'), '30', 'Check for maxlength attribute' );
 
 	var body = document.body, $body = minimal(body);
@@ -84,13 +84,12 @@ test("setAttr()", function() {
 	var attributeNode = document.createAttribute('irrelevant'),
 		commentNode = document.createComment('some comment'),
 		textNode = document.createTextNode('some text');
-	
+
 	minimal.each([commentNode, textNode, attributeNode], function( i, elem ) {
 		var $elem = minimal( elem );
 		$elem.setAttr( 'nonexisting', 'foo' );
 		strictEqual( $elem.getAttr('nonexisting'), undefined, 'setAttr works correctly on comment and text nodes' );
 	});
-
 
 	var table = minimal('#table1'),
 		td = minimal('td', table).first();
