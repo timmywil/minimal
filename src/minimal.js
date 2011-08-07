@@ -313,8 +313,18 @@
 	};
 
 	var hasClass = minimal.hasClass = function( node, classStr ) {
-		return node && classStr &&
-			!!~(' ' + node.className + ' ').indexOf( ' ' + classStr + ' ' );
+		if ( !node || !classStr ) {
+			return false;
+		}
+
+		var cls = ' ' + node.className + ' ';
+		classStr = classStr.split( rspaces );
+		for ( var i = 0, len = classStr.length; i < len; ++i ) {
+			if ( !~cls.indexOf( ' ' + classStr[i] + ' ' ) ) {
+				return false;
+			}
+		}
+		return true;
 	};
 
 
