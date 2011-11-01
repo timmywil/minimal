@@ -12,8 +12,9 @@ test("first()", function() {
 });
 
 test("eq()", function() {
-	expect(1);
+	expect(2);
 	deepEqual( minimal('.list').eq(2).toArray(), q('listThree'), 'EQ correctly retreives zero-indexed element' );
+	deepEqual( minimal('.list').eq(-1).toArray(), q('listFiveDiv'), 'EQ correctly retreives negative zero-indexed element' );
 });
 
 test("find()", function() {
