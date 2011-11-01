@@ -16,10 +16,10 @@
 		rcomma = /\s*,\s*/,
 		rid = /^#([\w\-]+)$/,
 		rtagclass = /^(?:([\w]+)|([\w]+)?\.([\w\-]+))$/,
-		
+
 		// Classes
-		rtrimLeft = /^\s+/,
-		rtrimRight = /\s+$/,
+		// IE doesn't match non-breaking spaces with \s
+		rtrim = /\S/.test( '\xA0' ) ? /^\s+|\s+$/g : /^[\s\xA0]+|[\s\xA0]+$/,
 		rspaces = /\s+/,
 		ptrim = String.prototype.trim,
 
@@ -32,11 +32,11 @@
 		ralpha = /alpha\([^)]*\)/i,
 
 		// Core
-		forEach = [].forEach,
-		slice = [].slice,
-		push = [].push,
-		pindexOf = [].indexOf,
-		hasOwnProperty = ({}).hasOwnProperty;
+		forEach = Array.prototype.forEach,
+		slice = Array.prototype.slice,
+		push = Array.prototype.push,
+		pindexOf = Array.prototype.indexOf,
+		hasOwn = Object.prototype.hasOwnProperty;
 
 	/**
 	 * Main constructor
@@ -179,7 +179,7 @@
 
 		} else {
 			for ( key in obj ) {
-				if ( hasOwnProperty.call( obj, key ) ) {
+				if ( hasOwn.call( obj, key ) ) {
 					iterator.call( context, obj[ key ], key, obj );
 				}
 			}
@@ -219,19 +219,13 @@
 			return -1;
 		};
 
-	// IE doesn't match non-breaking spaces with \s
-	if ( /\S/.test( "\xA0" ) ) {
-		rtrimLeft = /^[\s\xA0]+/;
-		rtrimRight = /[\s\xA0]+$/;
-	}
-
 	// Cross-browser trim
 	var trim = minimal.trim = ptrim ?
 		function( str ) {
 			return ptrim.call( str );
 		} :
 		function( str ) {
-			return str.replace( rtrimLeft, '' ).replace( rtrimRight, '' );
+			return str.replace( rtrim, '' );
 		};
 
 
@@ -241,8 +235,11 @@
 	 */
 	var addClass = minimal.addClass = function( node, classStr ) {
 		classStr = classStr.split( rspaces );
-		var cls = ' ' + node.className + ' ';
-		for ( var i = 0, len = classStr.length, c; i < len; ++i ) {
+		var c,
+			cls = ' ' + node.className + ' ',
+			i = 0,
+			len = classStr.length;
+		for ( ; i < len; ++i ) {
 			c = classStr[ i ];
 			if ( c && cls.indexOf(' ' + c + ' ') < 0 ) {
 				cls += c + ' ';
@@ -252,11 +249,14 @@
 	};
 
 	var removeClass = minimal.removeClass = function( node, classStr ) {
-		var cls;
+		var cls, len, i;
+
 		if ( classStr !== undefined ) {
 			classStr = classStr.split( rspaces );
 			cls = ' ' + node.className + ' ';
-			for ( var i = 0, len = classStr.length; i < len; ++i ) {
+			i = 0;
+			len = classStr.length;
+			for ( ; i < len; ++i ) {
 				cls = cls.replace(' ' + classStr[ i ] + ' ', ' ');
 			}
 			cls = trim( cls );
@@ -287,14 +287,15 @@
 	 * Support
 	 */
 	var support = minimal.support = (function() {
-		var div = document.createElement('div');
+		var b,
+			div = document.createElement('div');
 		div.setAttribute('className', 't');
-		div.innerHTML = '<b style="float:left;opacity:.5"></b>';
-		var b = div.getElementsByTagName('b')[0];
+		div.innerHTML = '<b style="float:left;opacity:.55"></b>';
+		b = div.getElementsByTagName('b')[0];
 		return {
 			getSetAttribute: div.className !== 't',
 			cssFloat: !!b.style.cssFloat,
-			opacity: /^0.5$/.test( b.style.opacity )
+			opacity: /^0.55/.test( b.style.opacity )
 		};
 	})();
 
@@ -347,20 +348,17 @@
 			return;
 		}
 
-		// Always set to string
-		value += '';
-
 		if ( !support.getSetAttribute ) {
 			ret = node.getAttributeNode( name );
 			if ( !ret ) {
 				ret = document.createAttribute( name );
 				node.setAttributeNode( ret );
 			}
-			ret.nodeValue = value;
+			ret.nodeValue = value + '';
 			return;
 		}
 
-		node.setAttribute( name, value );
+		node.setAttribute( name, value + '' );
 	};
 
 
@@ -373,7 +371,7 @@
 			name = cssProps[ name ] || name;
 			var style,
 				ret = cssHooks[ name ];
-			if ( ret && hasOwnProperty.call(ret, 'get') ) {
+			if ( ret && hasOwn.call(ret, 'get') ) {
 				return ret.get( node, name );
 			} else {
 				ret = getComputedStyle( node, null )[ name ];
@@ -386,7 +384,7 @@
 			var left, rsLeft, style,
 				ret = cssHooks[ name ];
 
-			if ( ret && hasOwnProperty.call(ret, 'get') ) {
+			if ( ret && hasOwn.call(ret, 'get') ) {
 				return ret.get( node, name );
 			} else {
 				// Credits to jQuery
@@ -422,9 +420,8 @@
 	var cssProps = {
 		// Normalize float
 		'float': support.cssFloat ? 'cssFloat' : 'styleFloat'
-	};
-
-	var cssHooks = {};
+	},
+	cssHooks = {};
 
 	// IE uses filter for opacity
 	if ( !support.opacity ) {
@@ -435,8 +432,8 @@
 				return alpha ? alpha.opacity / 100 + '': '1';
 			},
 			set: function( node, value ) {
-				var style = node.style;
-				var alpha = node.filters.alpha;
+				var style = node.style,
+					alpha = node.filters.alpha;
 
 				style.zoom = 1; // Force opacity in IE by setting the zoom level
 				if ( alpha ) {
@@ -451,7 +448,7 @@
 	minimal.setCSS = function( node, name, value ) {
 		name = cssProps[ name ] || name;
 		var hook = cssHooks[ name ];
-		if ( hook && hasOwnProperty.call(hook, 'set') ) {
+		if ( hook && hasOwn.call(hook, 'set') ) {
 			hook.set( node, value );
 		} else {
 			node.style[ name ] = value;

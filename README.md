@@ -1,7 +1,7 @@
 minimal.js v0.3pre
 ================
 
-The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.6k minified/2.7k gzipped).
+The #1 priority for minimal is ___FAST___.  #2 is ___small___ (currently 6.7k minified/2.7k gzipped).
 
 With these priorities in mind, users should have at least an intermediate understanding of javascript.  minimal will not keep you safe, but it will keep you speedy.
 
@@ -395,5 +395,3 @@ Trigger an event on the matched elements.
 v0.1 - Core, Classes, Attributes, Traversing (w/o filter), and Events<br>
 v0.2 - Full-scale CSS component, window/document dimensions, and `.filter()`
 
-v0.3pre<br>
-- Some optimizations with suggestions from @rkatic including minor performance improvements for multiple selectors and most of the prototype bindings, negative fromIndex support in IE for `minimal.indexOf`, and some byte conservation.
