@@ -186,7 +186,7 @@ Keep in mind, this engine is not for those who do not understand the difference 
 ###.setAttr( name, value )
 
 	$('#anchor1').setAttr('title', 'weeeeeeeee');
-	$('#foo').setAttr('contenteditable', true); // contenteditable is enumerated
+	$('#foo').setAttr('contenteditable', 'true'); // contenteditable is enumerated
 
 
 ###.removeAttr( name )

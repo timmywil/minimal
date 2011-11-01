@@ -579,10 +579,12 @@
 			return new minimal( slice.apply( toArray(this), arguments ) );
 		},
 		first: function() {
-			return this.slice(0, 1);
+			return this.slice( 0, 1 );
 		},
 		eq: function( index ) {
-			return this.slice( index, index + 1 );
+			return ~(index = +index) ?
+				this.slice( index, index + 1 ) :
+				this.slice( index );
 		},
 		find: function( selector ) {
 			var node, sel, j, el,
