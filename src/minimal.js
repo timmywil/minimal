@@ -19,7 +19,7 @@
 
 		// Classes
 		// IE doesn't match non-breaking spaces with \s
-		rtrim = /\S/.test( '\xA0' ) ? /^\s+|\s+$/g : /^[\s\xA0]+|[\s\xA0]+$/,
+		rtrim = /\S/.test( '\xA0' ) ? /^[\s\xA0]+|[\s\xA0]+$/g : /^\s+|\s+$/g,
 		rspaces = /\s+/,
 		ptrim = String.prototype.trim,
 
