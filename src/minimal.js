@@ -6,6 +6,7 @@
  */
 
 (function( window, document ) {
+	"use strict";
 
 	var _$ = window.$,
 		_minimal = window.minimal,
@@ -44,7 +45,7 @@
 	var minimal = function( selector, root ) {
 
 		// Self-instantiate if not instantiated
-		if ( !this.version ) {
+		if ( !(this instanceof minimal) ) {
 			return new minimal( selector, root );
 		}
 
