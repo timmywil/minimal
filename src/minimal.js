@@ -69,6 +69,49 @@
 		return ret;
 	};
 
+	// An implementaton of each based off underscore.js
+	var each = minimal.each = minimal.forEach = function( obj, iterator, context ) {
+		var key, len;
+		if ( !obj ) {
+			return;
+		}
+
+		if ( forEach && obj.forEach === forEach ) {
+			obj.forEach( iterator, context );
+
+		} else if ( obj.length === +obj.length ) {
+			for ( key = 0, len = obj.length; key < len; key++ ) {
+				if ( key in obj ) {
+					iterator.call( context, obj[ key ], key, obj );
+				}
+			}
+
+		} else {
+			for ( key in obj ) {
+				if ( hasOwn.call( obj, key ) ) {
+					iterator.call( context, obj[ key ], key, obj );
+				}
+			}
+		}
+
+		return obj;
+	};
+
+	// Simplified merge & extend (merge expects numerical length, extend expects objects)
+	var merge = minimal.merge = function( one, two ) {
+		for ( var i = 0, len = two.length; i < len; i++ ) {
+			one[ i ] = two[ i ];
+		}
+		return one;
+	};
+	var extend = minimal.extend = function( one, two ) {
+		for ( var prop in two ) {
+			one[ prop ] = two[ prop ];
+		}
+		return one;
+	};
+
+
 	/**
 	 * A short simple selector engine
 	 * Never use descendants (although setting context is allowed) and only use id, tag, tag.class, or .class
@@ -158,49 +201,6 @@
 	// Retrieves the first of the matched set in a query
 	var query = function( selector, root ) {
 		return queryAll( selector, root )[0];
-	};
-
-
-	// An implementaton of each based off underscore.js
-	var each = minimal.each = minimal.forEach = function( obj, iterator, context ) {
-		var key, len;
-		if ( !obj ) {
-			return;
-		}
-
-		if ( forEach && obj.forEach === forEach ) {
-			obj.forEach( iterator, context );
-
-		} else if ( obj.length === +obj.length ) {
-			for ( key = 0, len = obj.length; key < len; key++ ) {
-				if ( key in obj ) {
-					iterator.call( context, obj[ key ], key, obj );
-				}
-			}
-
-		} else {
-			for ( key in obj ) {
-				if ( hasOwn.call( obj, key ) ) {
-					iterator.call( context, obj[ key ], key, obj );
-				}
-			}
-		}
-
-		return obj;
-	};
-
-	// Simplified merge & extend (merge expects numerical length, extend expects objects)
-	var merge = minimal.merge = function( one, two ) {
-		for ( var i = 0, len = two.length; i < len; i++ ) {
-			one[ i ] = two[ i ];
-		}
-		return one;
-	};
-	var extend = minimal.extend = function( one, two ) {
-		for ( var prop in two ) {
-			one[ prop ] = two[ prop ];
-		}
-		return one;
 	};
 
 	// Checks if an item is within an array
@@ -366,6 +366,12 @@
 	/**
 	 * CSS
 	 */
+	var cssProps = {
+		// Normalize float
+		'float': support.cssFloat ? 'cssFloat' : 'styleFloat'
+	},
+	cssHooks = {};
+
 	var getCSS;
 	if ( window.getComputedStyle ) {
 		getCSS = function( node, name ) {
@@ -417,12 +423,6 @@
 		};
 	}
 	minimal.getCSS = getCSS;
-
-	var cssProps = {
-		// Normalize float
-		'float': support.cssFloat ? 'cssFloat' : 'styleFloat'
-	},
-	cssHooks = {};
 
 	// IE uses filter for opacity
 	if ( !support.opacity ) {
@@ -479,7 +479,7 @@
 	/**
 	 * Events
 	 */
-	var on, off, preventDefault, stopPropogation;
+	var on, off, preventDefault, stopPropagation;
 	if ( document.addEventListener ) {
 		on = function( node, type, fn ) {
 			if ( node.addEventListener ) {
