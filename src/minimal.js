@@ -33,10 +33,11 @@
 		ralpha = /alpha\([^)]*\)/i,
 
 		// Core
-		forEach = Array.prototype.forEach,
-		slice = Array.prototype.slice,
-		push = Array.prototype.push,
-		pindexOf = Array.prototype.indexOf,
+		ArrayProto = Array.prototype,
+		forEach = ArrayProto.forEach,
+		slice = ArrayProto.slice,
+		push = ArrayProto.push,
+		pindexOf = ArrayProto.indexOf,
 		hasOwn = Object.prototype.hasOwnProperty;
 
 	/**
